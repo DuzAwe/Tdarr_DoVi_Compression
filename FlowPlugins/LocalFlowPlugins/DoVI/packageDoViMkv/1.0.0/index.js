@@ -40,11 +40,12 @@ exports.plugin = exports.details = void 0;
 var cliUtils_1 = require("../../../../FlowHelpers/1.0.0/cliUtils");
 var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 /* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
-var details = function () { return ({
-    name: 'Inject DoVi RPU',
-    description: 'Inject Dolby Vision RPU data',
+var details = function () {
+  return {
+    name: 'Package DoVi mkv',
+    description: 'Package HEVC stream with injected DoVi RPU in mkv (preserves all metadata)',
     style: {
-        borderColor: 'orange',
+      borderColor: 'orange',
     },
     tags: 'video',
     isStartPlugin: false,
@@ -54,62 +55,60 @@ var details = function () { return ({
     icon: '',
     inputs: [],
     outputs: [
-        {
-            number: 1,
-            tooltip: 'Continue to next plugin',
-        },
+      {
+        number: 1,
+        tooltip: 'Continue to next plugin',
+      },
     ],
-}); };
+  };
+};
 exports.details = details;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, rpuFilePath, outputFilePath, cliArgs, spawnArgs, cli, res;
+
+var plugin = function (args) {
+  return __awaiter(void 0, void 0, void 0, function () {
+    var lib, pluginWorkDir, outputFilePath, spawnArgs, cli, res;
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                lib = require('../../../../../methods/lib')();
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-param-reassign
-                args.inputs = lib.loadDefaultValues(args.inputs, details);
-                pluginWorkDir = "".concat(args.workDir, "/dovi_tool");
-                args.deps.fsextra.ensureDirSync(pluginWorkDir);
-                rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
-                outputFilePath = "".concat((0, fileUtils_1.getPluginWorkDir)(args), "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.hevc");
-                cliArgs = [
-                    'inject-rpu',
-                    '-i',
-                    "".concat(args.inputFileObj.file || args.inputFileObj._id),
-                    '--rpu-in',
-                    "".concat(rpuFilePath),
-                    '-o',
-                    "".concat(outputFilePath),
-                ];
-                spawnArgs = cliArgs.map(function (row) { return row.trim(); }).filter(function (row) { return row !== ''; });
-                cli = new cliUtils_1.CLI({
-                    cli: '/usr/local/bin/dovi_tool',
-                    spawnArgs: spawnArgs,
-                    spawnOpts: {},
-                    jobLog: args.jobLog,
-                    outputFilePath: outputFilePath,
-                    inputFileObj: args.inputFileObj,
-                    logFullCliOutput: args.logFullCliOutput,
-                    updateWorker: args.updateWorker,
-                });
-                return [4 /*yield*/, cli.runCli()];
-            case 1:
-                res = _a.sent();
-                if (res.cliExitCode !== 0) {
-                    args.jobLog('Injecting DoVi RPU failed');
-                    throw new Error('dovi_tool failed');
-                }
-                args.logOutcome('tSuc');
-                return [2 /*return*/, {
-                        outputFileObj: {
-                            _id: outputFilePath,
-                        },
-                        outputNumber: 1,
-                        variables: args.variables,
-                    }];
-        }
+      switch (_a.label) {
+        case 0:
+          lib = require('../../../../../methods/lib')();
+          args.inputs = lib.loadDefaultValues(args.inputs, details);
+
+          pluginWorkDir = (0, fileUtils_1.getPluginWorkDir)(args);
+          outputFilePath = pluginWorkDir + "/" + (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + ".rpu.hevc.mkv";
+
+          spawnArgs = [
+            '-o',
+            outputFilePath,
+            args.inputFileObj.file
+          ];
+
+          cli = new cliUtils_1.CLI({
+            cli: '/usr/bin/mkvmerge',
+            spawnArgs: spawnArgs,
+            spawnOpts: {},
+            jobLog: args.jobLog,
+            outputFilePath: outputFilePath,
+            inputFileObj: args.inputFileObj,
+            logFullCliOutput: args.logFullCliOutput,
+            updateWorker: args.updateWorker,
+          });
+
+          return [4 /*yield*/, cli.runCli()];
+        case 1:
+          res = _a.sent();
+          if (res.cliExitCode !== 0) {
+            args.jobLog('Packaging stream into mkv failed');
+            throw new Error('mkvmerge failed');
+          }
+
+          args.logOutcome('tSuc');
+          return [2 /*return*/, {
+            outputFileObj: { _id: outputFilePath },
+            outputNumber: 1,
+            variables: args.variables,
+          }];
+      }
     });
-}); };
+  });
+};
 exports.plugin = plugin;

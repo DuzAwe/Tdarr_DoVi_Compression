@@ -107,23 +107,13 @@ var plugin = function (args) {
           */
           fallbackMissing = !!args.variables.fallbackMissing; // e.g. set by a prior plugin
 
-          if (fallbackMissing) {
-            // Force single-layer
-            cliString = "dovi_tool -m 2 convert --discard \"" + inputFilePath + "\" -o \"" + outFilePath + "\"";
-          } else {
-            // Normal approach
-            if (videoStreamCount === 1) {
-              // Single-stream => convert
-              cliString = "dovi_tool -m 2 convert --discard \"" + inputFilePath + "\" -o \"" + outFilePath + "\"";
-            } else {
-              // Dual-stream => inject
-              cliString =
-                "/usr/local/bin/dovi_tool inject-rpu " +
-                "-i \"" + inputFilePath + "\" " +
-                "--rpu-in \"" + rpuFilePath + "\" " +
-                "-o \"" + outFilePath + "\"";
-            }
-          }
+          // Always inject RPU into the current base stream (post-encode)
+          // Using the previously extracted RPU ensures DV is present after encode
+          cliString =
+            "/usr/local/bin/dovi_tool inject-rpu " +
+            "-i \"" + (args.inputFileObj.file || args.inputFileObj._id) + "\" " +
+            "--rpu-in \"" + rpuFilePath + "\" " +
+            "-o \"" + outFilePath + "\"";
 
           // We'll run the resulting command in bash
           spawnArgs = ['-c', cliString];

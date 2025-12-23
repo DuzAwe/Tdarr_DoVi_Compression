@@ -51,6 +51,13 @@ var plugin = function (args) {
     const subtitle_languages = String(args.inputs.subtitle_languages).trim().split(',');
     args.variables.ffmpegCommand.container = 'hevc';
     args.variables.ffmpegCommand.shouldProcess = true;
+    // Ensure overall output args exist and disable audio for raw HEVC output
+    if (!args.variables.ffmpegCommand.overallOuputArguments) {
+        args.variables.ffmpegCommand.overallOuputArguments = [];
+    }
+    // Raw .hevc cannot contain audio; force no-audio and set format explicitly
+    args.variables.ffmpegCommand.overallOuputArguments.unshift('-an');
+    args.variables.ffmpegCommand.overallOuputArguments.unshift('-f', 'hevc');
 
     const originalDir = require('path').dirname(args.originalLibraryFile._id);
     const originalFileName = require('path').basename(args.originalLibraryFile._id);

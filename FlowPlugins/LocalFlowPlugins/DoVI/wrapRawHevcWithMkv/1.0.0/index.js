@@ -39,16 +39,11 @@ exports.plugin = exports.details = void 0;
 var cliUtils_1 = require("../../../../FlowHelpers/1.0.0/cliUtils");
 var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 
-/* 
-  This plugin injects a previously extracted DoVi 7 RPU into a base HEVC stream 
-  or converts a single-stream p7 to p8.
-*/
-
-var details = function () { 
+var details = function () {
   return {
-    name: 'Inject DoVi RPU 7',
-    description: 'Handles Dolby Vision Profile 7 RPU injection or conversion to Profile 8',
-    style: { borderColor: 'orange' },
+    name: 'Wrap Raw HEVC in MKV (timestamps)',
+    description: 'Uses mkvmerge to wrap raw HEVC into MKV and sets default-duration based on the original file FPS to create valid timestamps.',
+    style: { borderColor: '#6efefc' },
     tags: 'video',
     isStartPlugin: false,
     pType: '',
@@ -57,97 +52,93 @@ var details = function () {
     icon: '',
     inputs: [],
     outputs: [
-      { number: 1, tooltip: 'Continue to next plugin' },
+      {
+        number: 1,
+        tooltip: 'Continue to next plugin',
+      },
     ],
   };
 };
 exports.details = details;
 
-var plugin = function (args) { 
+var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, videoStreamCountCmd, probeRes, videoStreamCount, cliString, spawnArgs, cli, res;
+    var lib, pluginWorkDir, baseName, outputFilePath, fpsStr, streams, i, rFrameRate, parts, cliArgs, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           lib = require('../../../../../methods/lib')();
           args.inputs = lib.loadDefaultValues(args.inputs, details);
 
-          pluginWorkDir = args.workDir + "/dovi_tool";
+          pluginWorkDir = args.workDir + "/mkvmerge_wrap";
           args.deps.fsextra.ensureDirSync(pluginWorkDir);
 
-          // The input HEVC file we want to inject into
-          inputFilePath = args.inputFileObj.file;
-          // The RPU metadata from the previous extraction step
-            rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
+          baseName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id);
+          outputFilePath = pluginWorkDir + "/" + baseName + "_video_wrapped.mkv";
 
-          // Our final injected or converted output
-          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_rpu_injected.hevc";
-          outFilePath = pluginWorkDir + "/" + outFileName;
-
-          // Count video streams to decide between single-stream or dual-stream approach
-          videoStreamCountCmd = new cliUtils_1.CLI({
-            cli: 'ffprobe',
-            spawnArgs: [
-              '-v', 'error',
-              '-select_streams', 'v',
-              '-show_entries', 'stream=index',
-              '-of', 'csv=p=0',
-              inputFilePath
-            ],
-            spawnOpts: {},
-            jobLog: args.jobLog,
-            inputFileObj: args.inputFileObj,
-            updateWorker: args.updateWorker
-          });
-          return [4 /*yield*/, videoStreamCountCmd.runCli()];
-        case 1:
-          probeRes = _a.sent();
-          videoStreamCount = 1;
-          if (probeRes.cliExitCode === 0 && probeRes.cliOutput) {
-            videoStreamCount = probeRes.cliOutput
-              .split('\n')
-              .filter(function (line) { return line.trim() !== ''; }).length;
+          // Determine FPS from original file metadata (r_frame_rate)
+          fpsStr = '23.976';
+          try {
+            streams = (args.originalLibraryFile.ffProbeData && args.originalLibraryFile.ffProbeData.streams) || [];
+            for (i = 0; i < streams.length; i++) {
+              if (streams[i].codec_type === 'video') {
+                rFrameRate = streams[i].r_frame_rate;
+                if (rFrameRate) {
+                  parts = rFrameRate.split('/');
+                  if (parts.length === 2) {
+                    fpsStr = parts[0] + "/" + parts[1];
+                  } else {
+                    fpsStr = parseFloat(rFrameRate).toFixed(3);
+                  }
+                }
+                break;
+              }
+            }
+          } catch (err) {
+            // keep default
           }
 
-          /*
-            If there's only 1 stream (DV p7 single-stream):
-              We do a convert step: "dovi_tool -m 2 convert --discard -i input -o output"
-            If there are 2 streams:
-              We do: "dovi_tool inject-rpu -i BL.hevc --rpu-in RPU.bin -o BL_RPU.hevc"
-          */
-          // Always inject RPU into the current base stream (post-encode)
-          cliString = 
-            "/usr/local/bin/dovi_tool inject-rpu " +
-            "-i \"" + (args.inputFileObj.file || args.inputFileObj._id) + "\" " +
-            "--rpu-in \"" + rpuFilePath + "\" " +
-            "-o \"" + outFilePath + "\"";
+          // mkvmerge: set default-duration for track 0 (video) to FPS to create timestamps
+          cliArgs = [
+            '-o', outputFilePath,
+            '--default-duration', '0:' + fpsStr + 'p',
+            '--no-audio', '--no-subtitles', '--no-chapters',
+            args.inputFileObj.file,
+          ];
 
-          // We'll run the resulting command in bash
-          spawnArgs = ['-c', cliString];
+          spawnArgs = cliArgs
+            .map(function (row) { return row.trim(); })
+            .filter(function (row) { return row !== ''; });
+
           cli = new cliUtils_1.CLI({
-            cli: '/bin/bash',
+            cli: '/usr/bin/mkvmerge',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,
-            outputFilePath: outFilePath,
+            outputFilePath: outputFilePath,
             inputFileObj: args.inputFileObj,
             logFullCliOutput: args.logFullCliOutput,
             updateWorker: args.updateWorker,
           });
+
           return [4 /*yield*/, cli.runCli()];
-        case 2:
+        case 1:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
-            args.jobLog('Injecting/Converting DoVi RPU failed');
-            throw new Error('dovi_tool failed');
+            args.jobLog('mkvmerge wrapping failed');
+            throw new Error('mkvmerge failed');
           }
+
           args.logOutcome('tSuc');
+          // Provide the wrapped MKV as the current input file for subsequent plugins
           return [2 /*return*/, {
             outputFileObj: {
-              _id: outFilePath
+              _id: outputFilePath,
+              file: outputFilePath,
+              fileData: args.inputFileObj.fileData,
             },
             outputNumber: 1,
-            variables: args.variables
+            variables: args.variables,
           }];
       }
     });
