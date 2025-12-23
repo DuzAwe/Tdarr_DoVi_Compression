@@ -34,7 +34,7 @@ RUN wget -O - "https://github.com/quietvoid/dovi_tool/releases/download/${DOVI_T
 RUN wget -O - "https://github.com/quietvoid/hdr10plus_tool/releases/download/${HDR10PLUS_TOOL_TAG}/hdr10plus_tool-${HDR10PLUS_TOOL_TAG}-x86_64-unknown-linux-musl.tar.gz" | \
     tar -zx -C /usr/local/bin/
 
-FROM haveagitgat/tdarr_node:latest
+FROM ghcr.io/haveagitgat/tdarr_node:latest
 
 # Copy tools from the build stage
 COPY --from=build /usr/local/bin/dovi_tool /usr/local/bin/

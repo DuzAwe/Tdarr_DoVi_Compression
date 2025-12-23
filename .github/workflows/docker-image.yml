@@ -57,7 +57,7 @@ jobs:
           echo "OWNER_LC=$OWNER_LOWER" >> $GITHUB_ENV
       
       - name: Build and Push Docker image to GHCR
-        if: steps.check.outputs.changed == 'false'
+        if: steps.check.outputs.changed == 'true'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -68,11 +68,11 @@ jobs:
             ghcr.io/${{ env.OWNER_LC }}/dovi-tdarr-node:${{ steps.get-version.outputs.version }}
 
       - name: Save new version
-        if: steps.check.outputs.changed == 'flase'
+        if: steps.check.outputs.changed == 'true'
         run: echo "${{ steps.get-version.outputs.version }}" > tdarr_version.txt
 
       - name: Commit and push updated version file
-        if: steps.check.outputs.changed == 'false'
+        if: steps.check.outputs.changed == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
