@@ -40,6 +40,7 @@ FROM haveagitgat/tdarr_node:2.37.01
 COPY --from=build /usr/local/bin/dovi_tool /usr/local/bin/
 COPY --from=build /usr/local/bin/hdr10plus_tool /usr/local/bin/
 # COPY --from=build /usr/local/bin/MP4Box /usr/local/bin/
-COPY --from=build /usr/local/bin/gpac /usr/local/bin/
+# COPY --from=build /usr/local/bin/gpac /usr/local/bin/
 
-RUN chmod 755 /usr/local/bin/dovi_tool /usr/local/bin/hdr10plus_tool /usr/local/bin/MP4Box /usr/local/bin/gpac
+RUN chmod 755 /usr/local/bin/dovi_tool /usr/local/bin/hdr10plus_tool
+# RUN chmod 755 /usr/local/bin/dovi_tool /usr/local/bin/hdr10plus_tool /usr/local/bin/MP4Box /usr/local/bin/gpac
