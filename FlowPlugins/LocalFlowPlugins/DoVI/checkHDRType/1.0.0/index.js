@@ -50,8 +50,8 @@ var plugin = function (args) {
   // Default assumption is SDR
   var outputNum = 4;
 
-  // 1) Check MediaInfo track first for Dolby Vision or HDR10+
-  //    That way if the file is HDR10+, we set output=2 right away.
+  // 1) Check MediaInfo track first for Dolby Vision or HDR10+.
+  //    Prefer DV when both are present (e.g., DV P8.1 with HDR10+ compatibility).
   if (
     args.inputFileObj &&
     args.inputFileObj.mediaInfo &&
@@ -59,29 +59,27 @@ var plugin = function (args) {
   ) {
     args.inputFileObj.mediaInfo.track.forEach(function (stream) {
       if (stream['@type'] && stream['@type'].toLowerCase() === 'video') {
-        var hdrFormat = stream.HDR_Format || ''; // e.g. "SMPTE ST 2094 App 4"
-        // Also check HDR_Format_Commercial or HDR_Format_Compatibility if needed
-        var hdrCommercial = stream.HDR_Format_Commercial || ''; // e.g. "HDR10+"
-        var combinedInfo = (hdrFormat + ' ' + hdrCommercial).toLowerCase();
+        var hdrFormat = String(stream.HDR_Format || '');           // e.g. "SMPTE ST 2094 App 4"
+        var hdrCommercial = String(stream.HDR_Format_Commercial || ''); // e.g. "Dolby Vision" / "HDR10+"
+        var hdrProfile = String(stream.HDR_Format_Profile || '');  // e.g. "dvhe.08.06"
 
-        // Dolby Vision?
-        if (/dolby\s?vision/i.test(combinedInfo)) {
-          outputNum = 1;
+        // Minimal change: include DV profile string (dvhe.*) in the text we search
+        var combinedInfo = (hdrFormat + ' ' + hdrCommercial + ' ' + hdrProfile).toLowerCase();
+
+        // Prefer DV when present; otherwise detect HDR10+
+        if (/dolby\s?vision|dvhe\./i.test(combinedInfo)) {
+          outputNum = 1; // Dolby Vision
+        } else if (/hdr10\+|smpte\s?st\s?2094/i.test(combinedInfo)) {
+          outputNum = 2; // HDR10+
         }
-        // HDR10+?
-        else if (/hdr10\+|smpte\s?st\s?2094/i.test(combinedInfo)) {
-          outputNum = 2;
-        }
-        // If we haven't set DV or HDR10+ yet but see "HDR10" in the data, we could
-        // set outputNum=3, but we will cross-check with the ffProbe color_transfer in next step
+        // If neither matched, leave for ffprobe-based fallback below
       }
     });
   }
 
-  // 2) If still not DV or HDR10+, check ffProbe data for standard HDR10
-  //    If we see color_transfer=smpte2084 etc. => It's HDR10 unless already set to #2
+  // 2) If still not DV or HDR10+, check ffProbe data for standard HDR10.
+  //    If we see color_transfer=smpte2084 etc. => It's HDR10 unless already set.
   if (outputNum === 4) {
-    // We only attempt setting #3 if it’s not DV or HDR10+ already
     if (
       args.inputFileObj &&
       args.inputFileObj.ffProbeData &&
@@ -90,12 +88,10 @@ var plugin = function (args) {
       for (var i = 0; i < args.inputFileObj.ffProbeData.streams.length; i++) {
         var stream = args.inputFileObj.ffProbeData.streams[i];
         if (stream.codec_type === 'video') {
-          if (
-            stream.color_transfer === 'smpte2084' &&
-            stream.color_primaries === 'bt2020'
-          ) {
-            // We assume HDR10
-            outputNum = 3;
+          var trc = String(stream.color_transfer || stream.color_trc || '').toLowerCase();
+          var prim = String(stream.color_primaries || '').toLowerCase();
+          if ((trc.includes('2084') || trc.includes('pq')) && prim.includes('2020')) {
+            outputNum = 3; // HDR10
             break;
           }
         }
