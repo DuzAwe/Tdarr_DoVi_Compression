@@ -6,12 +6,8 @@ on:
   workflow_dispatch:
 
 permissions:
-<<<<<<< HEAD
   contents: read
   packages: write
-=======
-  contents: write
->>>>>>> nextSteps
 
 jobs:
   build:
@@ -21,20 +17,12 @@ jobs:
       - uses: actions/checkout@v4
 
       # Login first so setup-buildx can pull its BuildKit image without 401s
-<<<<<<< HEAD
       - name: Log in to GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-=======
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
->>>>>>> nextSteps
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -62,7 +50,6 @@ jobs:
           else
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
-<<<<<<< HEAD
       
       - name: Set lowercase owner
         run: |
@@ -71,17 +58,11 @@ jobs:
       
       - name: Build and Push Docker image to GHCR
         if: steps.check.outputs.changed == 'false'
-=======
-
-      - name: Build and Push Docker image
-        if: steps.check.outputs.changed == 'true'
->>>>>>> nextSteps
         uses: docker/build-push-action@v5
         with:
           context: .
           file: 'Docker/dovi-tdarr-node:latest/Dockerfile'
           push: true
-<<<<<<< HEAD
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/dovi-tdarr-node:latest
             ghcr.io/${{ env.OWNER_LC }}/dovi-tdarr-node:${{ steps.get-version.outputs.version }}
@@ -92,16 +73,6 @@ jobs:
 
       - name: Commit and push updated version file
         if: steps.check.outputs.changed == 'false'
-=======
-          tags: nichols89ben/dovi-tdarr-node:latest
-
-      - name: Save new version
-        if: steps.check.outputs.changed == 'true'
-        run: echo "${{ steps.get-version.outputs.version }}" > tdarr_version.txt
-
-      - name: Commit and push updated version file
-        if: steps.check.outputs.changed == 'true'
->>>>>>> nextSteps
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
