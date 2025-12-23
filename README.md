@@ -1,12 +1,12 @@
 # Tdarr_DoVi_Processing
 
-A set of Tdarr plugins that can handle Dolby Vision videos in **Profiles 4, 5, 7, 8**, and **HDR10+**, remuxing them into MP4 files compatible with LG TVs (and other devices). This project originated from andrasmaroy’s [Tdarr_Plugins_DoVi](https://github.com/andrasmaroy/Tdarr_Plugins_DoVi), then expanded to include additional functionality for Profile 7 and HDR10+ with the help of ChatGPT.
+A set of Tdarr plugins that can handle Dolby Vision videos in **Profiles 4, 5, 7, 8**, and **HDR10+**, remuxing and re-encoding with NVENC into MKV files aiming for a 60% reduction in size. This project originated from andrasmaroy’s [Tdarr_Plugins_DoVi](https://github.com/andrasmaroy/Tdarr_Plugins_DoVi) & nichols89ben [Tdarr_Plugins_DoVi](https://github.com/nichols89ben/Tdarr_DoVi_Processing). I spent a number of weeks adding the NVENC process testing accross all DV Profiles.
 
 ---
 
 ## Overview
 
-Many LG OLED owners (and other users) encounter problems with certain Dolby Vision (DoVi) profiles, missing HDR10 fallback, or device crashes (e.g., the Nvidia Shield showing a green or purple screen). 
+Many Users could save GBs with no noticable drop in quality. 
 
 - **Goal**: Preserve Dolby Vision whenever possible while ensuring the file remains playable on LG TVs and other devices.  
 - **Main Approach**:  
