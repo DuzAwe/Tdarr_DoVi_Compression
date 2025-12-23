@@ -2,7 +2,7 @@ FROM ghcr.io/haveagitgat/tdarr_node:latest AS build
 #FROM ghcr.io/haveagitgat/tdarr_node:2.40.01 AS build
 
 ARG DOVI_TOOL_TAG="2.1.3"
-ARG MP4BOX_TAG="v2.4.0"
+#ARG MP4BOX_TAG="v2.4.0"
 ARG HDR10PLUS_TOOL_TAG="1.6.1"
 
 # Update and install dependencies
@@ -20,11 +20,11 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # MP4Box
-RUN git clone --depth 1 --branch ${MP4BOX_TAG} https://github.com/gpac/gpac.git && \
-    cd gpac && \
-    ./configure --static-bin && \
-    make -j$(nproc) && \
-    make install
+# RUN git clone --depth 1 --branch ${MP4BOX_TAG} https://github.com/gpac/gpac.git && \
+#     cd gpac && \
+#     ./configure --static-bin && \
+#     make -j$(nproc) && \
+#     make install
 
 # Dovi Tool
 RUN wget -O - "https://github.com/quietvoid/dovi_tool/releases/download/${DOVI_TOOL_TAG}/dovi_tool-${DOVI_TOOL_TAG}-x86_64-unknown-linux-musl.tar.gz" | \
