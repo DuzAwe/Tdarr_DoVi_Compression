@@ -1,0 +1,1992 @@
+{
+  "_id": "BxXFt1xUa",
+  "name": "DoVi Repack/Encode",
+  "description": "DoVi Repack/Encode",
+  "tags": "",
+  "flowPlugins": [
+    {
+      "name": "ℹ️ IMPORTANT - This plugin is a PRO feature only, if you dont have Pro please check the README for the only workaround I can think of. ",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "nuscvjdso",
+      "position": {
+        "x": 827.9677100748664,
+        "y": -1828.4155156774248
+      }
+    },
+    {
+      "name": "Begin NVENC (P8)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "nvStartP8",
+      "position": {
+        "x": 1080,
+        "y": -120
+      }
+    },
+    {
+      "name": "NVENC - Encode HEVC (P8)",
+      "sourceRepo": "Local",
+      "pluginName": "nvencEncodeHevc",
+      "version": "1.0.1",
+      "fpEnabled": true,
+      "id": "nvEncP8",
+      "position": {
+        "x": 1080,
+        "y": -72
+      }
+    },
+    {
+      "name": "Execute NVENC (P8)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "nvExecP8",
+      "position": {
+        "x": 1080,
+        "y": -24
+      }
+    },
+    {
+      "name": "Begin NVENC (P7)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "nvStartP7",
+      "position": {
+        "x": 1284,
+        "y": -120
+      }
+    },
+    {
+      "name": "NVENC - Encode HEVC (P7)",
+      "sourceRepo": "Local",
+      "pluginName": "nvencEncodeHevc",
+      "version": "1.0.1",
+      "fpEnabled": true,
+      "id": "nvEncP7",
+      "position": {
+        "x": 1284,
+        "y": -24
+      }
+    },
+    {
+      "name": "Execute NVENC (P7)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "nvExecP7",
+      "position": {
+        "x": 1284,
+        "y": -72
+      }
+    },
+    {
+      "name": "Begin NVENC (P7 SL)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "nvStartP7S",
+      "position": {
+        "x": 1488,
+        "y": -120
+      }
+    },
+    {
+      "name": "NVENC - Encode HEVC (P7 SL)",
+      "sourceRepo": "Local",
+      "pluginName": "nvencEncodeHevc",
+      "version": "1.0.1",
+      "fpEnabled": true,
+      "id": "nvEncP7S",
+      "position": {
+        "x": 1488,
+        "y": -72
+      }
+    },
+    {
+      "name": "Execute NVENC (P7 SL)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "nvExecP7S",
+      "position": {
+        "x": 1488,
+        "y": -24
+      }
+    },
+    {
+      "name": "Begin NVENC (HDR10+)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "nvStartHDR",
+      "position": {
+        "x": 1680,
+        "y": -120
+      }
+    },
+    {
+      "name": "NVENC - Encode HEVC (HDR10+)",
+      "sourceRepo": "Local",
+      "pluginName": "nvencEncodeHevc",
+      "version": "1.0.1",
+      "fpEnabled": true,
+      "id": "nvEncHDR",
+      "position": {
+        "x": 1680,
+        "y": -72
+      }
+    },
+    {
+      "name": "Execute NVENC (HDR10+)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "nvExecHDR",
+      "position": {
+        "x": 1680,
+        "y": -24
+      }
+    },
+    {
+      "name": "EXIT - FILE is already MKV and PROFILE 4/5 or 8, should not need further processing. Disable if filter if bypassing to re-encode",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "zCh2Z_epA",
+      "position": {
+        "x": 826.916857122066,
+        "y": -1026.5702047797508
+      }
+    },
+    {
+      "name": "DoVi Stage 3 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "D1lw0jfLb",
+      "position": {
+        "x": 1488,
+        "y": 144
+      }
+    },
+    {
+      "name": "Stage 3 - DoVi Processing - EXTRACT + INJECT RPU",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "QyOzTUQLD",
+      "position": {
+        "x": 1481.6338047146353,
+        "y": -224.67724198119555
+      }
+    },
+    {
+      "name": "Check for is_dovi7_single_convert🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.is_dovi7_single_convert}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "bgs4syrr0",
+      "position": {
+        "x": 1476.0332941584018,
+        "y": -309.94540667383393
+      }
+    },
+    {
+      "name": "Dolby Vision Profile 7 - Will output as DoVi Profile 8",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "2GKoH9od3",
+      "position": {
+        "x": 1475.984778264441,
+        "y": -366.834394580955
+      }
+    },
+    {
+      "name": "Set Variable is_dovi7_single_convert 🎯",
+      "sourceRepo": "Community",
+      "pluginName": "setFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "is_dovi7_single_convert",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "tjpNTau7s",
+      "position": {
+        "x": 1746.3202681315595,
+        "y": -1091.2870111138936
+      }
+    },
+    {
+      "name": "P7 - MISSING HDR10 Fallback Metadata",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "cuX7IoAGZ",
+      "position": {
+        "x": 1746.8629684305777,
+        "y": -1176.8288688470657
+      }
+    },
+    {
+      "name": "P7 - Has HDR10 Fallback Metadata",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "6KRTUt_Tq",
+      "position": {
+        "x": 1543.6490214052526,
+        "y": -1172.5054755509345
+      }
+    },
+    {
+      "name": "Checks if the HDR10 fallback metadata is missing, if it is, converting from a single to dual layer can help with playback issues on profile 7 conversions. ",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "bUiRJZiOP",
+      "position": {
+        "x": 1726.7371255962876,
+        "y": -1432.8408685252718
+      }
+    },
+    {
+      "name": "⛔️⛔️ ERROR - No Tags Found - Check Flow ⛔️⛔️",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "6D7zUeDAd",
+      "position": {
+        "x": 1882.1353304709844,
+        "y": -333.0528253066899
+      }
+    },
+    {
+      "name": "⛔️⛔️ ERROR - Either HDR10 or not HDR, Nothing to process in this flow ⛔️⛔️",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "FGLxLhenh",
+      "position": {
+        "x": 1996.1124403365293,
+        "y": -1508.302724090823
+      }
+    },
+    {
+      "name": "ℹ️ Note - If you're running multiple flows, make sure this is the last one before saving or replacing. I've discovered that any further processing after this step may overwrite the DoVi data stored in the MKV file, rendering all the work you've done thus far useless.",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "BaOg-t6oe",
+      "position": {
+        "x": 1029.904617525923,
+        "y": -2130.870268204477
+      }
+    },
+    {
+      "name": "DoVi Stage 4 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "UpP4mFtqG",
+      "position": {
+        "x": 1380,
+        "y": 588
+      }
+    },
+    {
+      "name": "DoVi Stage 3 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "9Ibf80DN-",
+      "position": {
+        "x": 1680,
+        "y": 144
+      }
+    },
+    {
+      "name": "Stage 3 - DoVi Processing - EXTRACT + INJECT + PACKAGE Metadata",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "K-wHGUbkv",
+      "position": {
+        "x": 1680,
+        "y": -228
+      }
+    },
+    {
+      "name": "DoVi Stage 3 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "DM4HLv5A6",
+      "position": {
+        "x": 1284,
+        "y": 144
+      }
+    },
+    {
+      "name": "Stage 3 - DoVi Processing - EXTRACT + INJECT RPU",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "gqZtT3mvf",
+      "position": {
+        "x": 1284,
+        "y": -216
+      }
+    },
+    {
+      "name": "DoVi Stage 3 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "2SeIXdF3j",
+      "position": {
+        "x": 1080,
+        "y": 144
+      }
+    },
+    {
+      "name": "HDR10+  - Will output as DoVi Profile 8",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "Zr27-EOGK",
+      "position": {
+        "x": 1671.3648926273797,
+        "y": -370.0268808264862
+      }
+    },
+    {
+      "name": "Dolby Vision Profile 7 - Will output as DoVi Profile 8",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "iuUcLAzFB",
+      "position": {
+        "x": 1287.915867526873,
+        "y": -368.9333738274651
+      }
+    },
+    {
+      "name": "Dolby Vision Profiles 4, 5, 8",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "6uPoPElzz",
+      "position": {
+        "x": 1085.7490777191688,
+        "y": -369.4387836874358
+      }
+    },
+    {
+      "name": "Check for is_hdrplus 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.is_hdrplus}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "gB6Va9cFe",
+      "position": {
+        "x": 1672.052434352361,
+        "y": -303.036411100899
+      }
+    },
+    {
+      "name": "Check for is_dovi7 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.is_dovi7}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "2PbPWJ2eF",
+      "position": {
+        "x": 1287.387540703619,
+        "y": -298.31806171636504
+      }
+    },
+    {
+      "name": "ℹ️ Filter by previously tagged type",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "z4mspVLBx",
+      "position": {
+        "x": 1387.5889057594795,
+        "y": -461.4916368858526
+      }
+    },
+    {
+      "name": "ℹ️ The raw HEVC and srt streams are extracted from the file. Srt streams are moved to input directory and renamed. All audio streams including TrueHD and DCA are preserved in the final MKV output.",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "AMfaj9THT",
+      "position": {
+        "x": 1155.4785088702758,
+        "y": -880.3618462894777
+      }
+    },
+    {
+      "name": "DoVi Stage 1 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "cH45_OBDR",
+      "position": {
+        "x": 1386.220999308578,
+        "y": -1003.2432355564895
+      }
+    },
+    {
+      "name": "Stage 1 - DoVi Processing - Filter + Tag",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "u4ElRztTh",
+      "position": {
+        "x": 1297.6520156465108,
+        "y": -1632.9313671541752
+      }
+    },
+    {
+      "name": "Set Variable is_dovi 🎯",
+      "sourceRepo": "Community",
+      "pluginName": "setFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "is_dovi",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "fMGEd1hQ5",
+      "position": {
+        "x": 1067.4079650189965,
+        "y": -1014.7086088275406
+      }
+    },
+    {
+      "name": "DoVi Profile 7",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "nQHEBnHuK",
+      "position": {
+        "x": 1376.4613973442501,
+        "y": -1233.6740144838639
+      }
+    },
+    {
+      "name": "DoVi Profile 8",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "Kx3p8sBBM",
+      "position": {
+        "x": 1259.5111807800033,
+        "y": -1155.003316655324
+      }
+    },
+    {
+      "name": "DoVi Profile 5",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "PgWDieyHy",
+      "position": {
+        "x": 1177.5093502672783,
+        "y": -1196.835688806626
+      }
+    },
+    {
+      "name": "DoVi Profile 4",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "D_agyMgni",
+      "position": {
+        "x": 1095.3380578659037,
+        "y": -1238.999262904801
+      }
+    },
+    {
+      "name": "Set Variable is_dovi7 🎯",
+      "sourceRepo": "Community",
+      "pluginName": "setFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "is_dovi7",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "ohhinhJPd",
+      "position": {
+        "x": 1543.9794001408413,
+        "y": -1079.6832721895605
+      }
+    },
+    {
+      "name": "Set Variable is_hdrplus 🎯",
+      "sourceRepo": "Community",
+      "pluginName": "setFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "is_hdrplus",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "rhYZ5KjcK",
+      "position": {
+        "x": 1385.2466369948222,
+        "y": -1413.2674942506353
+      }
+    },
+    {
+      "name": "Non - HDR",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "HYBaupfx0",
+      "position": {
+        "x": 1689.1943063173342,
+        "y": -1580.8822203439888
+      }
+    },
+    {
+      "name": "✅Contains Dolby Vision✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "s7K_Oex4-",
+      "position": {
+        "x": 1253.0491337263409,
+        "y": -1380.2031775249357
+      }
+    },
+    {
+      "name": "✅Contains HDR10+✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "mVN-tv4fN",
+      "position": {
+        "x": 1385.885827738315,
+        "y": -1460.9394409987403
+      }
+    },
+    {
+      "name": "HDR10",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "uo9GihNf6",
+      "position": {
+        "x": 1855.5956812431593,
+        "y": -1580.4571385857112
+      }
+    },
+    {
+      "name": "ℹ️ Important!! if incoming from another flow, or if any processing was done beforehand. One of the flow plugins will use the original file when repackaging, potentially removing any changes made earlier unless replaced with the changes made up to this point.",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "K9_KSabxi",
+      "position": {
+        "x": 1704.248327465828,
+        "y": -1888.5759508834642
+      }
+    },
+    {
+      "name": "ℹ️ Important!! This will ensure the cusotm DoVI node is currently in use, if not the flow will fail as tools are missing. Ensure the custom node is tagged by going to the main dashboard - \"Select the Custom Node > Options > Node Tags > DoVi_Yeezy\"",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "SBJlBuz0d",
+      "position": {
+        "x": 1058.611950395688,
+        "y": -1825.016199687515
+      }
+    },
+    {
+      "name": "ℹ️ This cleans up any metadata generated during processing.",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "qd0W2in0K",
+      "position": {
+        "x": 1323.7065047067754,
+        "y": -2102.8111078813636
+      }
+    },
+    {
+      "name": "🏁🏁 DoVi Change Complete 🏁🏁",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "tsLoD_PyQ",
+      "position": {
+        "x": 1380,
+        "y": 660
+      }
+    },
+    {
+      "name": "Stage 4 DoVi Processing - RePackage",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "lC9xV8Swo",
+      "position": {
+        "x": 1380,
+        "y": 216
+      }
+    },
+    {
+      "name": "Wrap Raw HEVC in MKV (timestamps)",
+      "sourceRepo": "Local",
+      "pluginName": "wrapRawHevcWithMkv",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "WrpRawMkv",
+      "position": {
+        "x": 1380,
+        "y": 276
+      }
+    },
+    {
+      "name": "DoVi Stage 2 Complete ✅",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "H5Pr8Qt7R",
+      "position": {
+        "x": 1387.0807829607857,
+        "y": -518.4282916237145
+      }
+    },
+    {
+      "name": "Stage 3 - DoVi Processing - EXTRACT + INJECT RPU",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "Ir6nzopNn",
+      "position": {
+        "x": 1080,
+        "y": -216
+      }
+    },
+    {
+      "name": "Execute DoVi Remux",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "O05LOTxgZ",
+      "position": {
+        "x": 1380,
+        "y": 528
+      }
+    },
+    {
+      "name": "Set mkv Container",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandSetContainer",
+      "version": "1.0.0",
+      "inputsDB": {
+        "container": "mkv",
+        "forceConform": "true"
+      },
+      "fpEnabled": true,
+      "id": "ijOxQ9qo0",
+      "position": {
+        "x": 1380,
+        "y": 396
+      }
+    },
+    {
+      "name": "Begin Command",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "rtjmsjaZ2",
+      "position": {
+        "x": 1380,
+        "y": 336
+      }
+    },
+    {
+      "name": "Stage 2 - DoVi Processing - EXTRACT",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "PUaO8fkY0",
+      "position": {
+        "x": 1386.566404582663,
+        "y": -938.1570331085928
+      }
+    },
+    {
+      "name": "Check for is_dovi 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.is_dovi}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "zUQ42dg3v",
+      "position": {
+        "x": 1085.9067186801562,
+        "y": -298.4837834555177
+      }
+    },
+    {
+      "name": "🚀🚀 DoVi PROCESSING - START 🚀🚀",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "mA4SWPwTE",
+      "position": {
+        "x": 1297.209640398569,
+        "y": -1823.1707121788613
+      }
+    },
+    {
+      "name": "Input File",
+      "sourceRepo": "Community",
+      "pluginName": "inputFile",
+      "version": "1.0.0",
+      "inputsDB": {
+        "pauseNodeIfAccessChecksFail": "false",
+        "fileAccessChecks": "true"
+      },
+      "fpEnabled": true,
+      "id": "pE6rU7gkW",
+      "position": {
+        "x": 1200.5625120763584,
+        "y": -2190.4970276318804
+      }
+    },
+    {
+      "name": "Begin Command",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "6yAeb0HFm",
+      "position": {
+        "x": 1386.6940608007383,
+        "y": -863.8947020866524
+      }
+    },
+    {
+      "name": "Execute Extract HEVC stream",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "YxbKSxKYF",
+      "position": {
+        "x": 1386.6615732597634,
+        "y": -612.5018164319478
+      }
+    },
+    {
+      "name": "Requeue for DoVi Node",
+      "sourceRepo": "Community",
+      "pluginName": "tagsRequeue",
+      "version": "1.0.0",
+      "inputsDB": {
+        "useBasicQueueTags": "false",
+        "basicQueueTags": "requireCPU",
+        "customQueueTags": "requireCPUorGPU,DoVi_Yeezy"
+      },
+      "fpEnabled": true,
+      "id": "Y5rRbinFT",
+      "position": {
+        "x": 1297.0484097964224,
+        "y": -1720.857420000547
+      }
+    },
+    {
+      "name": "Replace Original File",
+      "sourceRepo": "Community",
+      "pluginName": "replaceOriginalFile",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ZF3nnux_N",
+      "position": {
+        "x": 1380,
+        "y": 744
+      }
+    },
+    {
+      "name": "🚚🚚ENTER FROM ANOTHER FLOW🚚🚚",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "uTF9uuy1a",
+      "position": {
+        "x": 1467.2998336088458,
+        "y": -2203.546445444565
+      }
+    },
+    {
+      "name": "Replace Original File",
+      "sourceRepo": "Community",
+      "pluginName": "replaceOriginalFile",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "vzQ6rNJbq",
+      "position": {
+        "x": 1490.838387353645,
+        "y": -1849.3665858917693
+      }
+    },
+    {
+      "name": "ffmpeg - Reorder Streams DoVi",
+      "sourceRepo": "Local",
+      "pluginName": "ffmpegCommandRorderStreamsDovi",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ngnnHNouX",
+      "position": {
+        "x": 1386.7509656892933,
+        "y": -789.5404758863463
+      }
+    },
+    {
+      "name": "Remux DoVi MKV",
+      "sourceRepo": "Local",
+      "pluginName": "ffmpegCommandRemuxMkvDovi",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "vUOzVHt9o",
+      "position": {
+        "x": 1380,
+        "y": 468
+      }
+    },
+    {
+      "name": "Check DoVi Profile",
+      "sourceRepo": "Local",
+      "pluginName": "checkDoViProfile",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "cKu_1q_hA",
+      "position": {
+        "x": 1252.3910927375307,
+        "y": -1310.8923190140044
+      }
+    },
+    {
+      "name": "Run MKVPropEdit",
+      "sourceRepo": "Community",
+      "pluginName": "runMkvPropEdit",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "MZ3wWeYL7",
+      "position": {
+        "x": 1389.8604767611632,
+        "y": -1920.6003465973147
+      }
+    },
+    {
+      "name": "⚠️⚠️ Error running MKVPropEdit - Continuing Anyway ⚠️⚠️",
+      "sourceRepo": "Community",
+      "pluginName": "resetFlowError",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "AUFNqLJnf",
+      "position": {
+        "x": 1658.3798455985984,
+        "y": -1988.9133674075736
+      }
+    },
+    {
+      "name": "Check if MKV",
+      "sourceRepo": "Community",
+      "pluginName": "checkFileExtension",
+      "version": "1.0.0",
+      "inputsDB": {
+        "extensions": "mkv"
+      },
+      "fpEnabled": true,
+      "id": "T3z1S0FcQ",
+      "position": {
+        "x": 1465.7106047093234,
+        "y": -2024.1462737882366
+      }
+    },
+    {
+      "name": "Fail Flow",
+      "sourceRepo": "Community",
+      "pluginName": "failFlow",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "6wLtjuPpX",
+      "position": {
+        "x": 1883.247508495994,
+        "y": -250.97869841528043
+      }
+    },
+    {
+      "name": "ffmpeg - Extract Streams DoVI",
+      "sourceRepo": "Local",
+      "pluginName": "ffmpegCommandExtractStreamsDoVi",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "cSjUerrHe",
+      "position": {
+        "x": 1386.72422953773,
+        "y": -700.0689688504001
+      }
+    },
+    {
+      "name": "Check HDR type",
+      "sourceRepo": "Local",
+      "pluginName": "checkHDRType",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "FAbA1f_6f",
+      "position": {
+        "x": 1297.4897975500141,
+        "y": -1559.3000962791896
+      }
+    },
+    {
+      "name": "Check HDR10 Fallback Metadata",
+      "sourceRepo": "Local",
+      "pluginName": "checkHdrFallback",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "37PKT3zrW",
+      "position": {
+        "x": 1642.9261197610642,
+        "y": -1271.1261638242481
+      }
+    },
+    {
+      "name": "Extract DoVi 7 RPU",
+      "sourceRepo": "Local",
+      "pluginName": "extractDoVi7Rpu",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "Zy_hzDk19",
+      "position": {
+        "x": 1284,
+        "y": -156
+      }
+    },
+    {
+      "name": "Extract DoVi 7 (Dual > Single-Layer)",
+      "sourceRepo": "Local",
+      "pluginName": "extractDoVi7RpuSingleLayer",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "tpzWvVYop",
+      "position": {
+        "x": 1488,
+        "y": -168
+      }
+    },
+    {
+      "name": "Extract DoVi RPU",
+      "sourceRepo": "Local",
+      "pluginName": "extractDoViRpu",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "23DrvLYZ5",
+      "position": {
+        "x": 1080,
+        "y": -156
+      }
+    },
+    {
+      "name": "Extract HDR10+ Metadata",
+      "sourceRepo": "Local",
+      "pluginName": "extractHDR10PlusMetadata",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "mT11Eua2J",
+      "position": {
+        "x": 1680,
+        "y": -168
+      }
+    },
+    {
+      "name": "Inject DoVi RPU 7",
+      "sourceRepo": "Local",
+      "pluginName": "injectDoVi7Rpu",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "bO2_RoL9u",
+      "position": {
+        "x": 1284,
+        "y": 24
+      }
+    },
+    {
+      "name": "Inject DoVi 7 (Dual > Single-Layer)",
+      "sourceRepo": "Local",
+      "pluginName": "injectDoVi7RpuSingleLayer",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ALl24BWfe",
+      "position": {
+        "x": 1488,
+        "y": 24
+      }
+    },
+    {
+      "name": "Inject DoVi RPU",
+      "sourceRepo": "Local",
+      "pluginName": "injectDoViRpu",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "lAKsc7QUZ",
+      "position": {
+        "x": 1080,
+        "y": 24
+      }
+    },
+    {
+      "name": "Inject HDR10+ as DoVi P8",
+      "sourceRepo": "Local",
+      "pluginName": "injectHdr10toDoVi8",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "iZwguD20Q",
+      "position": {
+        "x": 1680,
+        "y": 24
+      }
+    },
+    {
+      "name": "Package DoVi 7 mkv (DISABLED - Direct HEVC→MKV)",
+      "sourceRepo": "Local",
+      "pluginName": "packageDoVi7Mkv",
+      "version": "1.0.0",
+      "fpEnabled": false,
+      "id": "XXqSI9Yi8",
+      "position": {
+        "x": 1284,
+        "y": 60
+      }
+    },
+    {
+      "name": "Package DoVi 7 mkv (Dual > Single-Layer) (DISABLED - Direct HEVC→MKV)",
+      "sourceRepo": "Local",
+      "pluginName": "packageDoVi7MkvSingleLayer",
+      "version": "1.0.0",
+      "fpEnabled": false,
+      "id": "MVpCqWL6O",
+      "position": {
+        "x": 1488,
+        "y": 72
+      }
+    },
+    {
+      "name": "Package DoVi mkv (DISABLED - Direct HEVC→MKV)",
+      "sourceRepo": "Local",
+      "pluginName": "packageDoViMkv",
+      "version": "1.0.0",
+      "fpEnabled": false,
+      "id": "09NmWSuU_",
+      "position": {
+        "x": 1080,
+        "y": 60
+      }
+    },
+    {
+      "name": "Package HDR10+ mkv (DISABLED - Direct HEVC→MKV)",
+      "sourceRepo": "Local",
+      "pluginName": "packageHdr10PlusMkv",
+      "version": "1.0.0",
+      "fpEnabled": false,
+      "id": "ZYVItNiyZ",
+      "position": {
+        "x": 1680,
+        "y": 60
+      }
+    },
+    {
+      "name": "Fail Flow",
+      "sourceRepo": "Community",
+      "pluginName": "failFlow",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "On2TUw8aQ",
+      "position": {
+        "x": 1996.0625502678536,
+        "y": -1406.1861050381708
+      }
+    },
+    {
+      "name": "ℹ️ At this point in any of the flows, if you wanted to re - encode the raw HEVC you need to do it at this point, right after the extract RPU and before the INJECT RPU. Just ensure you maintain the HDR10 fallback metadata as ffmpeg may strip it. ",
+      "sourceRepo": "Community",
+      "pluginName": "comment",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ISAGN5272",
+      "position": {
+        "x": 888,
+        "y": -180
+      }
+    },
+    {
+      "name": "Check if MP4 (DISABLED for MKV workflow)",
+      "sourceRepo": "Community",
+      "pluginName": "checkFileExtension",
+      "version": "1.0.0",
+      "inputsDB": {
+        "extensions": "mp4"
+      },
+      "fpEnabled": false,
+      "id": "-9dZgoCI3",
+      "position": {
+        "x": 1093.799376715666,
+        "y": -1121.3311241291876
+      }
+    }
+  ],
+  "flowEdges": [
+    {
+      "source": "pE6rU7gkW",
+      "sourceHandle": "1",
+      "target": "mA4SWPwTE",
+      "targetHandle": null,
+      "id": "c3hu5s8G4"
+    },
+    {
+      "source": "rtjmsjaZ2",
+      "sourceHandle": "1",
+      "target": "ijOxQ9qo0",
+      "targetHandle": null,
+      "id": "nTxTt8PMC"
+    },
+    {
+      "source": "lC9xV8Swo",
+      "sourceHandle": "1",
+      "target": "WrpRawMkv",
+      "targetHandle": null,
+      "id": "L4ToWrap"
+    },
+    {
+      "source": "WrpRawMkv",
+      "sourceHandle": "1",
+      "target": "rtjmsjaZ2",
+      "targetHandle": null,
+      "id": "WrapToBegin"
+    },
+    {
+      "source": "mA4SWPwTE",
+      "sourceHandle": "1",
+      "target": "Y5rRbinFT",
+      "targetHandle": null,
+      "id": "D2rPCzOE3"
+    },
+    {
+      "source": "PUaO8fkY0",
+      "sourceHandle": "1",
+      "target": "6yAeb0HFm",
+      "targetHandle": null,
+      "id": "TwTuPBQFY"
+    },
+    {
+      "source": "6yAeb0HFm",
+      "sourceHandle": "1",
+      "target": "ngnnHNouX",
+      "targetHandle": null,
+      "id": "0TerDhFFI"
+    },
+    {
+      "source": "ijOxQ9qo0",
+      "sourceHandle": "1",
+      "target": "vUOzVHt9o",
+      "targetHandle": null,
+      "id": "cCktRAmHD"
+    },
+    {
+      "source": "vUOzVHt9o",
+      "sourceHandle": "1",
+      "target": "O05LOTxgZ",
+      "targetHandle": null,
+      "id": "hYSgN0A2v"
+    },
+    {
+      "source": "SBJlBuz0d",
+      "sourceHandle": "1",
+      "target": "Y5rRbinFT",
+      "targetHandle": null,
+      "id": "5pmz44iwM"
+    },
+    {
+      "source": "uTF9uuy1a",
+      "sourceHandle": "1",
+      "target": "T3z1S0FcQ",
+      "targetHandle": null,
+      "id": "dXMNcw_6o"
+    },
+    {
+      "source": "T3z1S0FcQ",
+      "sourceHandle": "1",
+      "target": "MZ3wWeYL7",
+      "targetHandle": null,
+      "id": "unKdQjKs1"
+    },
+    {
+      "source": "T3z1S0FcQ",
+      "sourceHandle": "err1",
+      "target": "AUFNqLJnf",
+      "targetHandle": null,
+      "id": "2nUflR57A"
+    },
+    {
+      "source": "AUFNqLJnf",
+      "sourceHandle": "1",
+      "target": "vzQ6rNJbq",
+      "targetHandle": null,
+      "id": "d3ss3L4Y9"
+    },
+    {
+      "source": "T3z1S0FcQ",
+      "sourceHandle": "2",
+      "target": "vzQ6rNJbq",
+      "targetHandle": null,
+      "id": "m5EKPbv4X"
+    },
+    {
+      "source": "MZ3wWeYL7",
+      "sourceHandle": "1",
+      "target": "vzQ6rNJbq",
+      "targetHandle": null,
+      "id": "mUfq47hiF"
+    },
+    {
+      "source": "qd0W2in0K",
+      "sourceHandle": "1",
+      "target": "MZ3wWeYL7",
+      "targetHandle": null,
+      "id": "eRenBNskI"
+    },
+    {
+      "source": "K9_KSabxi",
+      "sourceHandle": "1",
+      "target": "vzQ6rNJbq",
+      "targetHandle": null,
+      "id": "kNX6H_EEz"
+    },
+    {
+      "source": "mVN-tv4fN",
+      "sourceHandle": "1",
+      "target": "rhYZ5KjcK",
+      "targetHandle": null,
+      "id": "LUjMlKVFI"
+    },
+    {
+      "source": "s7K_Oex4-",
+      "sourceHandle": "1",
+      "target": "cKu_1q_hA",
+      "targetHandle": null,
+      "id": "p93wlIm4M"
+    },
+    {
+      "source": "cKu_1q_hA",
+      "sourceHandle": "1",
+      "target": "D_agyMgni",
+      "targetHandle": null,
+      "id": "kYjUF0EVJ"
+    },
+    {
+      "source": "cKu_1q_hA",
+      "sourceHandle": "2",
+      "target": "PgWDieyHy",
+      "targetHandle": null,
+      "id": "ijlFbCf1D"
+    },
+    {
+      "source": "cKu_1q_hA",
+      "sourceHandle": "5",
+      "target": "Kx3p8sBBM",
+      "targetHandle": null,
+      "id": "HjD2a2Nsc"
+    },
+    {
+      "source": "Y5rRbinFT",
+      "sourceHandle": "1",
+      "target": "u4ElRztTh",
+      "targetHandle": null,
+      "id": "S58BYE_kr"
+    },
+    {
+      "source": "cH45_OBDR",
+      "sourceHandle": "1",
+      "target": "PUaO8fkY0",
+      "targetHandle": null,
+      "id": "8RTO4g1Px"
+    },
+    {
+      "source": "AMfaj9THT",
+      "sourceHandle": "1",
+      "target": "PUaO8fkY0",
+      "targetHandle": null,
+      "id": "60aqdgP_e"
+    },
+    {
+      "source": "YxbKSxKYF",
+      "sourceHandle": "1",
+      "target": "H5Pr8Qt7R",
+      "targetHandle": null,
+      "id": "jjmuVKXU0"
+    },
+    {
+      "source": "23DrvLYZ5",
+      "sourceHandle": "1",
+      "target": "nvStartP8",
+      "targetHandle": null,
+      "id": "P8_to_nvStart"
+    },
+    {
+      "source": "nvStartP8",
+      "sourceHandle": "1",
+      "target": "nvEncP8",
+      "targetHandle": null,
+      "id": "P8_nvStart_to_nvEnc"
+    },
+    {
+      "source": "nvEncP8",
+      "sourceHandle": "1",
+      "target": "nvExecP8",
+      "targetHandle": null,
+      "id": "P8_nvEnc_to_nvExec"
+    },
+    {
+      "source": "nvExecP8",
+      "sourceHandle": "1",
+      "target": "lAKsc7QUZ",
+      "targetHandle": null,
+      "id": "P8_nvExec_to_inject"
+    },
+    {
+      "source": "Zy_hzDk19",
+      "sourceHandle": "1",
+      "target": "nvStartP7",
+      "targetHandle": null,
+      "id": "P7_to_nvStart"
+    },
+    {
+      "source": "nvStartP7",
+      "sourceHandle": "1",
+      "target": "nvEncP7",
+      "targetHandle": null,
+      "id": "P7_nvStart_to_nvEnc"
+    },
+    {
+      "source": "nvEncP7",
+      "sourceHandle": "1",
+      "target": "nvExecP7",
+      "targetHandle": null,
+      "id": "P7_nvEnc_to_nvExec"
+    },
+    {
+      "source": "nvExecP7",
+      "sourceHandle": "1",
+      "target": "bO2_RoL9u",
+      "targetHandle": null,
+      "id": "P7_nvExec_to_inject"
+    },
+    {
+      "source": "tpzWvVYop",
+      "sourceHandle": "1",
+      "target": "nvStartP7S",
+      "targetHandle": null,
+      "id": "P7S_to_nvStart"
+    },
+    {
+      "source": "nvStartP7S",
+      "sourceHandle": "1",
+      "target": "nvEncP7S",
+      "targetHandle": null,
+      "id": "P7S_nvStart_to_nvEnc"
+    },
+    {
+      "source": "nvEncP7S",
+      "sourceHandle": "1",
+      "target": "nvExecP7S",
+      "targetHandle": null,
+      "id": "P7S_nvEnc_to_nvExec"
+    },
+    {
+      "source": "nvExecP7S",
+      "sourceHandle": "1",
+      "target": "ALl24BWfe",
+      "targetHandle": null,
+      "id": "P7S_nvExec_to_inject"
+    },
+    {
+      "source": "mT11Eua2J",
+      "sourceHandle": "1",
+      "target": "nvStartHDR",
+      "targetHandle": null,
+      "id": "HDR_to_nvStart"
+    },
+    {
+      "source": "nvStartHDR",
+      "sourceHandle": "1",
+      "target": "nvEncHDR",
+      "targetHandle": null,
+      "id": "HDR_nvStart_to_nvEnc"
+    },
+    {
+      "source": "nvEncHDR",
+      "sourceHandle": "1",
+      "target": "nvExecHDR",
+      "targetHandle": null,
+      "id": "HDR_nvEnc_to_nvExec"
+    },
+    {
+      "source": "nvExecHDR",
+      "sourceHandle": "1",
+      "target": "iZwguD20Q",
+      "targetHandle": null,
+      "id": "HDR_nvExec_to_inject"
+    },
+    {
+      "source": "H5Pr8Qt7R",
+      "sourceHandle": "1",
+      "target": "z4mspVLBx",
+      "targetHandle": null,
+      "id": "442ssb5ZI"
+    },
+    {
+      "source": "z4mspVLBx",
+      "sourceHandle": "1",
+      "target": "6uPoPElzz",
+      "targetHandle": null,
+      "id": "GlEJjscTL"
+    },
+    {
+      "source": "6uPoPElzz",
+      "sourceHandle": "1",
+      "target": "zUQ42dg3v",
+      "targetHandle": null,
+      "id": "NT5UhrmqX"
+    },
+    {
+      "source": "zUQ42dg3v",
+      "sourceHandle": "2",
+      "target": "iuUcLAzFB",
+      "targetHandle": null,
+      "id": "WYpu2OGIF"
+    },
+    {
+      "source": "iuUcLAzFB",
+      "sourceHandle": "1",
+      "target": "2PbPWJ2eF",
+      "targetHandle": null,
+      "id": "VYMq-kbjg"
+    },
+    {
+      "source": "Zr27-EOGK",
+      "sourceHandle": "1",
+      "target": "gB6Va9cFe",
+      "targetHandle": null,
+      "id": "rcvV04rXR"
+    },
+    {
+      "source": "2SeIXdF3j",
+      "sourceHandle": "1",
+      "target": "lC9xV8Swo",
+      "targetHandle": null,
+      "id": "MEn4aKERs"
+    },
+    {
+      "source": "DM4HLv5A6",
+      "sourceHandle": "1",
+      "target": "lC9xV8Swo",
+      "targetHandle": null,
+      "id": "g9ZgOOdkv"
+    },
+    {
+      "source": "9Ibf80DN-",
+      "sourceHandle": "1",
+      "target": "lC9xV8Swo",
+      "targetHandle": null,
+      "id": "5bOWx8h_Y"
+    },
+    {
+      "source": "O05LOTxgZ",
+      "sourceHandle": "1",
+      "target": "UpP4mFtqG",
+      "targetHandle": null,
+      "id": "-if76hPG-"
+    },
+    {
+      "source": "UpP4mFtqG",
+      "sourceHandle": "1",
+      "target": "tsLoD_PyQ",
+      "targetHandle": null,
+      "id": "DSw3B438l"
+    },
+    {
+      "source": "uo9GihNf6",
+      "sourceHandle": "1",
+      "target": "FGLxLhenh",
+      "targetHandle": null,
+      "id": "7oOCFaVv_"
+    },
+    {
+      "source": "HYBaupfx0",
+      "sourceHandle": "1",
+      "target": "FGLxLhenh",
+      "targetHandle": null,
+      "id": "RljtWf4cP"
+    },
+    {
+      "source": "gB6Va9cFe",
+      "sourceHandle": "2",
+      "target": "6D7zUeDAd",
+      "targetHandle": null,
+      "id": "AVgyXRL7f"
+    },
+    {
+      "source": "6D7zUeDAd",
+      "sourceHandle": "1",
+      "target": "6wLtjuPpX",
+      "targetHandle": null,
+      "id": "fyf2YeJPa"
+    },
+    {
+      "source": "ngnnHNouX",
+      "sourceHandle": "1",
+      "target": "cSjUerrHe",
+      "targetHandle": null,
+      "id": "MOIO4neQO"
+    },
+    {
+      "source": "cSjUerrHe",
+      "sourceHandle": "1",
+      "target": "YxbKSxKYF",
+      "targetHandle": null,
+      "id": "BB5zlgUXU"
+    },
+    {
+      "source": "FAbA1f_6f",
+      "sourceHandle": "4",
+      "target": "HYBaupfx0",
+      "targetHandle": null,
+      "id": "A7c4X20Pw"
+    },
+    {
+      "source": "FAbA1f_6f",
+      "sourceHandle": "3",
+      "target": "uo9GihNf6",
+      "targetHandle": null,
+      "id": "5hXjAhIHG"
+    },
+    {
+      "source": "FAbA1f_6f",
+      "sourceHandle": "2",
+      "target": "mVN-tv4fN",
+      "targetHandle": null,
+      "id": "9uQyo4DvG"
+    },
+    {
+      "source": "FAbA1f_6f",
+      "sourceHandle": "1",
+      "target": "s7K_Oex4-",
+      "targetHandle": null,
+      "id": "PJ2doZNwW"
+    },
+    {
+      "source": "u4ElRztTh",
+      "sourceHandle": "1",
+      "target": "FAbA1f_6f",
+      "targetHandle": null,
+      "id": "CxQkiCSb3"
+    },
+    {
+      "source": "cKu_1q_hA",
+      "sourceHandle": "3",
+      "target": "nQHEBnHuK",
+      "targetHandle": null,
+      "id": "P1JN2x-h1"
+    },
+    {
+      "source": "cKu_1q_hA",
+      "sourceHandle": "4",
+      "target": "nQHEBnHuK",
+      "targetHandle": null,
+      "id": "_Gqy_7kkK"
+    },
+    {
+      "source": "bUiRJZiOP",
+      "sourceHandle": "1",
+      "target": "37PKT3zrW",
+      "targetHandle": null,
+      "id": "IUCf_spnb"
+    },
+    {
+      "source": "nQHEBnHuK",
+      "sourceHandle": "1",
+      "target": "37PKT3zrW",
+      "targetHandle": null,
+      "id": "Apdrsoq9r"
+    },
+    {
+      "source": "37PKT3zrW",
+      "sourceHandle": "2",
+      "target": "cuX7IoAGZ",
+      "targetHandle": null,
+      "id": "hOPPNUbvq"
+    },
+    {
+      "source": "37PKT3zrW",
+      "sourceHandle": "1",
+      "target": "6KRTUt_Tq",
+      "targetHandle": null,
+      "id": "Cm19iblzu"
+    },
+    {
+      "source": "6KRTUt_Tq",
+      "sourceHandle": "1",
+      "target": "ohhinhJPd",
+      "targetHandle": null,
+      "id": "pgWh7XFy-"
+    },
+    {
+      "source": "cuX7IoAGZ",
+      "sourceHandle": "1",
+      "target": "tjpNTau7s",
+      "targetHandle": null,
+      "id": "QQV1_N5tz"
+    },
+    {
+      "source": "lAKsc7QUZ",
+      "sourceHandle": "1",
+      "target": "2SeIXdF3j",
+      "targetHandle": null,
+      "id": "IVenAA_ik"
+    },
+    {
+      "source": "bO2_RoL9u",
+      "sourceHandle": "1",
+      "target": "DM4HLv5A6",
+      "targetHandle": null,
+      "id": "YgLaK8CQL"
+    },
+    {
+      "source": "iZwguD20Q",
+      "sourceHandle": "1",
+      "target": "9Ibf80DN-",
+      "targetHandle": null,
+      "id": "AM5wx6COe"
+    },
+    {
+      "source": "2PbPWJ2eF",
+      "sourceHandle": "2",
+      "target": "2GKoH9od3",
+      "targetHandle": null,
+      "id": "U658z_mM7"
+    },
+    {
+      "source": "2GKoH9od3",
+      "sourceHandle": "1",
+      "target": "bgs4syrr0",
+      "targetHandle": null,
+      "id": "MSvKPk_JZ"
+    },
+    {
+      "source": "bgs4syrr0",
+      "sourceHandle": "2",
+      "target": "Zr27-EOGK",
+      "targetHandle": null,
+      "id": "ixNFoVx4g"
+    },
+    {
+      "source": "ALl24BWfe",
+      "sourceHandle": "1",
+      "target": "D1lw0jfLb",
+      "targetHandle": null,
+      "id": "9RzXhtYRy"
+    },
+    {
+      "source": "D1lw0jfLb",
+      "sourceHandle": "1",
+      "target": "lC9xV8Swo",
+      "targetHandle": null,
+      "id": "LI0N9aisj"
+    },
+    {
+      "source": "fMGEd1hQ5",
+      "sourceHandle": "1",
+      "target": "cH45_OBDR",
+      "targetHandle": null,
+      "id": "_lLGr3Zgx"
+    },
+    {
+      "source": "tjpNTau7s",
+      "sourceHandle": "1",
+      "target": "cH45_OBDR",
+      "targetHandle": null,
+      "id": "aJTXku5T7"
+    },
+    {
+      "source": "ohhinhJPd",
+      "sourceHandle": "1",
+      "target": "cH45_OBDR",
+      "targetHandle": null,
+      "id": "fujbJ-SWK"
+    },
+    {
+      "source": "rhYZ5KjcK",
+      "sourceHandle": "1",
+      "target": "cH45_OBDR",
+      "targetHandle": null,
+      "id": "iAT4rotIK"
+    },
+    {
+      "source": "zUQ42dg3v",
+      "sourceHandle": "1",
+      "target": "Ir6nzopNn",
+      "targetHandle": null,
+      "id": "WyDQ5Xuj0"
+    },
+    {
+      "source": "Ir6nzopNn",
+      "sourceHandle": "1",
+      "target": "23DrvLYZ5",
+      "targetHandle": null,
+      "id": "rZYXUVK60"
+    },
+    {
+      "source": "23DrvLYZ5",
+      "sourceHandle": "1",
+      "target": "lAKsc7QUZ",
+      "targetHandle": null,
+      "id": "HVZWI1_kT"
+    },
+    {
+      "source": "2PbPWJ2eF",
+      "sourceHandle": "1",
+      "target": "gqZtT3mvf",
+      "targetHandle": null,
+      "id": "heitjiA19"
+    },
+    {
+      "source": "gqZtT3mvf",
+      "sourceHandle": "1",
+      "target": "Zy_hzDk19",
+      "targetHandle": null,
+      "id": "jmSOStGKH"
+    },
+    {
+      "source": "Zy_hzDk19",
+      "sourceHandle": "1",
+      "target": "bO2_RoL9u",
+      "targetHandle": null,
+      "id": "-lJhDM-ud"
+    },
+    {
+      "source": "bgs4syrr0",
+      "sourceHandle": "1",
+      "target": "QyOzTUQLD",
+      "targetHandle": null,
+      "id": "q447vdg4i"
+    },
+    {
+      "source": "QyOzTUQLD",
+      "sourceHandle": "1",
+      "target": "tpzWvVYop",
+      "targetHandle": null,
+      "id": "ospnnrWRa"
+    },
+    {
+      "source": "tpzWvVYop",
+      "sourceHandle": "1",
+      "target": "ALl24BWfe",
+      "targetHandle": null,
+      "id": "TEFvNfa_Y"
+    },
+    {
+      "source": "gB6Va9cFe",
+      "sourceHandle": "1",
+      "target": "K-wHGUbkv",
+      "targetHandle": null,
+      "id": "YkrBrQCTQ"
+    },
+    {
+      "source": "K-wHGUbkv",
+      "sourceHandle": "1",
+      "target": "mT11Eua2J",
+      "targetHandle": null,
+      "id": "KEAvG796g"
+    },
+    {
+      "source": "mT11Eua2J",
+      "sourceHandle": "1",
+      "target": "iZwguD20Q",
+      "targetHandle": null,
+      "id": "0ar4rEZgM"
+    },
+    {
+      "source": "vzQ6rNJbq",
+      "sourceHandle": "1",
+      "target": "mA4SWPwTE",
+      "targetHandle": null,
+      "id": "mzpqKane2"
+    },
+    {
+      "source": "tsLoD_PyQ",
+      "sourceHandle": "1",
+      "target": "ZF3nnux_N",
+      "targetHandle": null,
+      "id": "c1Q8mRMgN"
+    },
+    {
+      "source": "FGLxLhenh",
+      "sourceHandle": "1",
+      "target": "On2TUw8aQ",
+      "targetHandle": null,
+      "id": "0KmL2V9fo"
+    },
+    {
+      "source": "ISAGN5272",
+      "sourceHandle": "1",
+      "target": "lAKsc7QUZ",
+      "targetHandle": null,
+      "id": "3GG4NRBIe"
+    },
+    {
+      "source": "D_agyMgni",
+      "sourceHandle": "1",
+      "target": "-9dZgoCI3",
+      "targetHandle": null,
+      "id": "6qMAd6OzC"
+    },
+    {
+      "source": "PgWDieyHy",
+      "sourceHandle": "1",
+      "target": "-9dZgoCI3",
+      "targetHandle": null,
+      "id": "nhRN29lsU"
+    },
+    {
+      "source": "Kx3p8sBBM",
+      "sourceHandle": "1",
+      "target": "-9dZgoCI3",
+      "targetHandle": null,
+      "id": "4GcKiVStj"
+    },
+    {
+      "source": "nuscvjdso",
+      "sourceHandle": "1",
+      "target": "SBJlBuz0d",
+      "targetHandle": null,
+      "id": "FiNM4N32o"
+    },
+    {
+      "source": "-9dZgoCI3",
+      "sourceHandle": "2",
+      "target": "fMGEd1hQ5",
+      "targetHandle": null,
+      "id": "ZG2Wfhm6L"
+    },
+    {
+      "source": "-9dZgoCI3",
+      "sourceHandle": "1",
+      "target": "zCh2Z_epA",
+      "targetHandle": null,
+      "id": "HomnkSbkk"
+    }
+  ]
+}
