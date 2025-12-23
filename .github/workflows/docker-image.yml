@@ -53,13 +53,8 @@ jobs:
       
       - name: Set lowercase owner
         run: |
-          echo "OWNER_LC=${{ github.repository_owner }}" >> $GITHUB_ENV
-        shell: bash
-      
-      - name: Use lowercase owner
-        run: |
           OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          echo "owner_lc=$OWNER_LOWER" >> $GITHUB_ENV
+          echo "OWNER_LC=$OWNER_LOWER" >> $GITHUB_ENV
       
       - name: Build and Push Docker image to GHCR
         if: steps.check.outputs.changed == 'false'
