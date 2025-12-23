@@ -47,7 +47,7 @@ services:
       - UMASK_SET=002
       - inContainer=true
       - nodeName=DoVi_Yeezy #you can change the name, but i would leave it the same as plugins would need to be adjusted
-      - ffmpegVersion=6
+      - ffmpegVersion=7
 
     volumes:
       - "/path/to/server:/app/server:rw"
