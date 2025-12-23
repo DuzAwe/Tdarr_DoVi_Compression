@@ -117,12 +117,27 @@ Below is a quick summary of each plugin used in the flow. Many are adapted from 
 
 Because we need `dovi_tool`, `hdr10plus_tool`, and `mkvmerge`, a **custom Docker image** is needed:
 
-- **Docker Hub**: [`nichols89ben/dovi-tdarr-node:latest`](https://hub.docker.com/r/nichols89ben/dovi-tdarr-node)  
-- This image aligns with the current Tdarr version and includes the required tools.  
-- If you’re running locally, you can install these tools yourself, but it’s untested here.
+- **GitHub Container Registry (preferred)**: `ghcr.io/<your-org>/dovi-tdarr-node:<tag>`  
+- **Docker Hub (legacy)**: [`nichols89ben/dovi-tdarr-node:latest`](https://hub.docker.com/r/nichols89ben/dovi-tdarr-node)  
+- The compose file defaults to GHCR via `TDARR_NODE_IMAGE`, but you can point it to any registry.
 
 ### Example Docker Compose
 **- Included in this repo**
+
+To use GitHub Container Registry (GHCR) for the DoVi node image, set an environment variable and login to GHCR:
+
+```bash
+# Login to GHCR (requires a GitHub Personal Access Token with "read:packages")
+echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_USERNAME" --password-stdin
+
+# Choose your image (replace org/name and tag as appropriate)
+export TDARR_NODE_IMAGE="ghcr.io/your-org/dovi-tdarr-node:latest"
+
+# Then bring up compose
+docker compose up -d
+```
+
+The compose file uses `image: ${TDARR_NODE_IMAGE:-ghcr.io/your-org/dovi-tdarr-node:latest}` so you can override per environment without editing the file.
 
 ### Installing Plugins
 
