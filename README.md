@@ -21,34 +21,36 @@ This README explains how the **Extract → Inject → Package** (or skip steps i
 ## Key Features
 
 1. **Handles DV Profiles 4/5/7/8 & HDR10+.**  
-2. **Optional fallback detection** (checks if ST 2086 / MaxCLL / Master Display info is present).  
-3. **Profile 7** can remain dual-layer or be converted to single-layer if fallback is missing.  
-4. **HDR10+** → DV Profile 8 conversion using `hdr10plus_tool`.  
-5. **SRT Subtitle extraction** and re-injection if desired.  
-6. **Can re-encode the base HEVC** or do simple pass-through.
+2. **Preserves original Dolby Vision profiles** — no forced P7→P8 conversion unless explicitly selected (HDR10+ lane only).  
+3. **Optional fallback detection** (checks if ST 2086 / MaxCLL / Master Display info is present).  
+4. **Profile 7** can remain dual-layer or be converted to single-layer if fallback is missing.  
+5. **HDR10+** → DV Profile 8 conversion using `hdr10plus_tool` (isolated to HDR10+ lane).  
+6. **All subtitle types preserved** in final remux (SubRip, PGS, etc.) — no sidecar files created.  
+7. **NVENC re-encoding** with adaptive bitrate and HDR metadata preservation (color primaries, transfer characteristics, mastering display, MaxCLL).  
+8. **Remux preserves original non-video streams** — only the video stream is replaced; audio, subtitles, chapters, and metadata remain unchanged.
 
 ---
 
 ## Plugin Flow (High-Level)
 
 1. **Check HDR type**  
-   - Identifies if file is DV, HDR10+, or SDR.  
+   - Identifies if file is DV, HDR10+, HDR10, or SDR via MediaInfo.  
 2. **Check DoVi Profile**  
-   - Determines Profile 4, 5, 7, or 8.  
+   - Determines Profile 4, 5, 7 (single/dual-layer), or 8.  
 3. **Check for HDR10 fallback**  
-   - Looks for Mastering Display / ST 2086 / CLL. If missing, flags it.  
+   - Looks for Mastering Display / ST 2086 / CLL. If missing, flags it.  
 4. **Extract / Reorder streams**  
-   - Plugin to reorder audio/subtitle streams or extract raw HEVC if needed.  
-5. **Process**  
-   - **Profile 4/5/8**: Typically just extract RPU and inject back, then package as DV Profile 8 MP4.  
-   - **Profile 7 (dual-layer)**: Keep both layers or discard the EL if fallback is missing → single-layer Profile 8.  
-   - **HDR10+**: Extract HDR10+ metadata to JSON, convert to DV Profile 8.  
-6. **Inject**  
-   - Re-inject the RPU or newly created DV metadata.  
-7. **Package**  
-   - Use MP4Box or similar, add the DV container flags (`:dvp=8.1:dv-cm=hdr10`).  
-8. **Remux**  
-   - Final step merges original audio streams / subtitles back into an MP4 container.
+   - Reorders streams and extracts raw HEVC video only. Subtitles remain untouched for final remux.  
+5. **NVENC Encode**  
+   - Re-encodes HEVC with adaptive bitrate, preserving HDR metadata (color primaries, transfer characteristics, mastering display, MaxCLL).  
+6. **Extract & Inject RPU**  
+   - **Profile 4/5/8**: Extract RPU with `dovi_tool extract-rpu`, inject back with `inject-rpu`. **Original profile preserved.**  
+   - **Profile 7**: Extract with `extractDoVi7Rpu` (no `-m 2`), inject with `injectDoVi7Rpu`. **Profile 7 remains Profile 7.**  
+   - **HDR10+**: Extract HDR10+ metadata to JSON, convert to DV Profile 8 via `injectHdr10toDoVi8`.  
+7. **Wrap with mkvmerge**  
+   - Wraps injected HEVC in video-only MKV with timestamps to protect DV NALs.  
+8. **Remux with ffmpeg**  
+   - Maps video from wrapped MKV and audio/subtitles/chapters/metadata from original file. Final output is MKV.
 
 ---
 
@@ -58,7 +60,7 @@ Below is a quick summary of each plugin used in the flow. Many are adapted from 
 
 1. **Check HDR Type**  
    - Determines if the file is Dolby Vision, HDR10+, HDR10, or SDR by scanning MediaInfo.  
-   - Adjusted to handle SMPTE ST 2094 (HDR10+) properly.
+   - **Enhanced** to detect DV via `HDR_Format_Profile` (e.g., `dvhe.08.06`) and prefer DV when both DV and HDR10+ are present (common in P8.1 files).
 
 2. **Check DoVi Profile**  
    - Inspects Dolby Vision to see if it’s Profile 4, 5, 7, or 8.  
@@ -73,40 +75,47 @@ Below is a quick summary of each plugin used in the flow. Many are adapted from 
    - Helps certain DoVi injection steps that rely on a fixed stream order.
 
 5. **ffmpeg - Extract Streams DoVi**  
-   - Extracts raw HEVC and .srt subtitles. Other tracks are dropped.  
-   - You can specify which subtitle languages to keep (default: English).
+   - Extracts raw HEVC video only. Subtitles are **not** extracted as sidecar files.  
+   - All original subtitle streams (SubRip, PGS, etc.) are preserved in the final remux via `-map 1:s?`.
 
-6. **Extract DoVi RPU / Inject DoVi RPU / Package DoVi MP4**  
-   - For **Profiles 4/5/8**: No forced `-m 2` usage. Metadata is kept intact.  
-   - For **Profile 7**: 
-     - **Extract DoVi 7 RPU** (dual-layer)  
-     - **Inject DoVi RPU 7** (can remain dual-layer or convert to single-layer with `--discard`).  
-     - **Package DoVi 7 mp4** uses MP4Box with `:dvp=8.1:dv-cm=hdr10`.
+6. **Extract DoVi RPU / Inject DoVi RPU / Wrap & Remux MKV**  
+   - For **Profiles 4/5/8**: Extract RPU with `dovi_tool extract-rpu`, inject back with `dovi_tool inject-rpu`. No forced `-m 2` usage. **Original profile is preserved.**
+   - For **Profile 7**: 
+     - **Extract DoVi 7 RPU** (dual-layer) without `-m 2` to preserve HDR10 fallback.  
+     - **Inject DoVi RPU 7** (always uses `inject-rpu`; no conversion to single-layer unless explicitly selected).  
+     - **Wrap with mkvmerge** (video-only MKV with timestamps) to protect DV NALs.  
+     - **Remux with ffmpeg** mapping video from wrapped MKV + audio/subs/chapters/metadata from original file.
+   - **Profile 7 remains Profile 7; no implicit P7→P8 conversion.**
 
 7. **Processing HDR10+**  
    - **Extract HDR10+ Metadata** → .json using `hdr10plus_tool`.  
-   - **Inject HDR10+ as DoVi P8** → Convert it to DV.  
-   - **Package** the new DV (Profile 8) track in MP4.
+   - **Inject HDR10+ as DoVi P8** → Convert it to DV Profile 8.  
+   - **Wrap & Remux** the new DV (Profile 8) track in MKV.
 
-8. **Remux DoVi MP4**  
-   - If input is MP4, merges existing audio/subtitle streams with the new DV video. If MKV, re-mux to MP4.  
-   - Unwanted or unsupported audio (e.g., TrueHD) can be removed or re-encoded.
+8. **Remux DoVi MKV**  
+   - Maps video from the wrapped MKV (output of step 6) and audio/subtitles/chapters/metadata from the original file.  
+   - Uses `-c copy` for all streams to avoid re-encoding. All audio codecs (including TrueHD/DTS-HD) are preserved.  
+   - Final container is MKV; original file is replaced with the new MKV.
 
 ---
 
 ## Common Flows
 
 **Short version**:  
-[Input File] → [Extract raw HEVC stream] → [Extract Dolby Vision RPU] → [Optional re-encode HEVC / keep fallback if needed] → [Inject DV RPU] → [Package into MP4 with DV Profile 8.1] → [Remux with original audio/subtitles]
+[Input File] → [Extract raw HEVC stream] → [Extract Dolby Vision RPU] → [NVENC re-encode HEVC with HDR fallback preserved] → [Inject DV RPU] → [Wrap with mkvmerge (video-only MKV)] → [Remux with ffmpeg (video from wrapped MKV + audio/subs/chapters from original)]
 
-
-- *Note*: If you do re-encode, be careful to preserve HDR10 fallback metadata. ffmpeg may strip it unless you add `-color_primaries bt2020 -color_trc smpte2084 ... -metadata "cll=..."`.
+**Key points:**
+- **Profile preservation**: Profile 7 inputs produce Profile 7 outputs; Profile 8 inputs produce Profile 8 outputs. No implicit conversion.
+- **HDR10+ lane**: Only the HDR10+ branch converts to DV Profile 8 via `injectHdr10toDoVi8`.
+- **NVENC encoding**: Adaptive bitrate with HDR metadata (color primaries, transfer, mastering display, MaxCLL) preserved via `-master-display` and `-max-cll`.
+- **Wrapping step**: `mkvmerge` creates a video-only MKV with timestamps to protect DV NALs before final remux.
+- **Final remux**: Maps video from wrapped MKV (`-map 0:v`) and audio/subs/chapters/metadata from original file (`-map 1:a`, `-map 1:s?`, `-map_chapters 1`, `-map_metadata 1`).
 
 ---
 
 ## Docker Image / Environment
 
-Because we need `dovi_tool`, `hdr10plus_tool`, and `MP4Box`, a **custom Docker image** is needed:
+Because we need `dovi_tool`, `hdr10plus_tool`, and `mkvmerge`, a **custom Docker image** is needed:
 
 - **Docker Hub**: [`nichols89ben/dovi-tdarr-node:latest`](https://hub.docker.com/r/nichols89ben/dovi-tdarr-node)  
 - This image aligns with the current Tdarr version and includes the required tools.  
@@ -169,7 +178,16 @@ Because we need `dovi_tool`, `hdr10plus_tool`, and `MP4Box`, a **custom Docker i
   Adjust tag names as needed for your specific setup or hardware (CPU/GPU).  
   <br>
 - **Make This the Last Flow**  
-Further processing on the MP4 file may overwrite/corrupt the DoVi metadata. Best to use this flow at the end of your pipeline.
+Further processing on the MKV file may overwrite/corrupt the DoVi metadata. Best to use this flow at the end of your pipeline.  
+  <br>
+- **MediaInfo Scan Required**  
+Ensure MediaInfo scanning is enabled in your Tdarr library settings. The flow relies on MediaInfo's `HDR_Format_Profile` (e.g., `dvhe.08.06`) to correctly detect Dolby Vision. Without MediaInfo, DV files may be misrouted to the Non-HDR lane.  
+  <br>
+- **Profile Preservation Policy**  
+This flow preserves the original Dolby Vision profile. Profile 7 inputs produce Profile 7 outputs; Profile 8 inputs produce Profile 8 outputs. Only the HDR10+ lane explicitly converts to Profile 8 via `injectHdr10toDoVi8`. No implicit P7→P8 conversion occurs.  
+  <br>
+- **Subtitle Handling**  
+All original subtitle streams (SubRip, PGS, etc.) are preserved in the final remux. No sidecar `.srt` files are created.  
   <br>
 - **Replacing the Original File**  
 Certain steps reference the original file for final packaging. If you’ve done prior processing, be sure to replace the original so it doesn’t revert your changes.
