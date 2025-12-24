@@ -24,8 +24,8 @@
       "fpEnabled": true,
       "id": "nvStartP8",
       "position": {
-        "x": 1080,
-        "y": -120
+        "x": 972,
+        "y": 0
       }
     },
     {
@@ -36,8 +36,8 @@
       "fpEnabled": true,
       "id": "nvEncP8",
       "position": {
-        "x": 1080,
-        "y": -72
+        "x": 972,
+        "y": 60
       }
     },
     {
@@ -51,8 +51,8 @@
       "fpEnabled": true,
       "id": "nvExecP8",
       "position": {
-        "x": 1080,
-        "y": -24
+        "x": 972,
+        "y": 132
       }
     },
     {
@@ -63,8 +63,8 @@
       "fpEnabled": true,
       "id": "nvStartP7",
       "position": {
-        "x": 1284,
-        "y": -120
+        "x": 1332,
+        "y": 0
       }
     },
     {
@@ -75,8 +75,8 @@
       "fpEnabled": true,
       "id": "nvEncP7",
       "position": {
-        "x": 1284,
-        "y": -24
+        "x": 1332,
+        "y": 60
       }
     },
     {
@@ -90,8 +90,8 @@
       "fpEnabled": true,
       "id": "nvExecP7",
       "position": {
-        "x": 1284,
-        "y": -72
+        "x": 1332,
+        "y": 132
       }
     },
     {
@@ -102,8 +102,8 @@
       "fpEnabled": true,
       "id": "nvStartP7S",
       "position": {
-        "x": 1488,
-        "y": -120
+        "x": 1764,
+        "y": 0
       }
     },
     {
@@ -114,8 +114,8 @@
       "fpEnabled": true,
       "id": "nvEncP7S",
       "position": {
-        "x": 1488,
-        "y": -72
+        "x": 1764,
+        "y": 60
       }
     },
     {
@@ -129,8 +129,8 @@
       "fpEnabled": true,
       "id": "nvExecP7S",
       "position": {
-        "x": 1488,
-        "y": -24
+        "x": 1764,
+        "y": 132
       }
     },
     {
@@ -141,8 +141,8 @@
       "fpEnabled": true,
       "id": "nvStartHDR",
       "position": {
-        "x": 1680,
-        "y": -120
+        "x": 2268,
+        "y": 0
       }
     },
     {
@@ -153,8 +153,8 @@
       "fpEnabled": true,
       "id": "nvEncHDR",
       "position": {
-        "x": 1680,
-        "y": -72
+        "x": 2268,
+        "y": 60
       }
     },
     {
@@ -168,8 +168,8 @@
       "fpEnabled": true,
       "id": "nvExecHDR",
       "position": {
-        "x": 1680,
-        "y": -24
+        "x": 2268,
+        "y": 132
       }
     },
     {
@@ -192,8 +192,8 @@
       "fpEnabled": true,
       "id": "D1lw0jfLb",
       "position": {
-        "x": 1488,
-        "y": 144
+        "x": 1500,
+        "y": 372
       }
     },
     {
@@ -204,8 +204,8 @@
       "fpEnabled": true,
       "id": "QyOzTUQLD",
       "position": {
-        "x": 1481.6338047146353,
-        "y": -224.67724198119555
+        "x": 1644,
+        "y": -228
       }
     },
     {
@@ -220,8 +220,8 @@
       "fpEnabled": true,
       "id": "bgs4syrr0",
       "position": {
-        "x": 1476.0332941584018,
-        "y": -309.94540667383393
+        "x": 1668,
+        "y": -312
       }
     },
     {
@@ -232,8 +232,8 @@
       "fpEnabled": true,
       "id": "2GKoH9od3",
       "position": {
-        "x": 1475.984778264441,
-        "y": -366.834394580955
+        "x": 1668,
+        "y": -408
       }
     },
     {
@@ -296,8 +296,8 @@
       "fpEnabled": true,
       "id": "6D7zUeDAd",
       "position": {
-        "x": 1882.1353304709844,
-        "y": -333.0528253066899
+        "x": 2652,
+        "y": -336
       }
     },
     {
@@ -332,8 +332,8 @@
       "fpEnabled": true,
       "id": "UpP4mFtqG",
       "position": {
-        "x": 1380,
-        "y": 588
+        "x": 1344,
+        "y": 876
       }
     },
     {
@@ -345,7 +345,7 @@
       "id": "9Ibf80DN-",
       "position": {
         "x": 1680,
-        "y": 144
+        "y": 372
       }
     },
     {
@@ -356,8 +356,8 @@
       "fpEnabled": true,
       "id": "K-wHGUbkv",
       "position": {
-        "x": 1680,
-        "y": -228
+        "x": 2088,
+        "y": -252
       }
     },
     {
@@ -368,8 +368,8 @@
       "fpEnabled": true,
       "id": "DM4HLv5A6",
       "position": {
-        "x": 1284,
-        "y": 144
+        "x": 1224,
+        "y": 372
       }
     },
     {
@@ -380,7 +380,7 @@
       "fpEnabled": true,
       "id": "gqZtT3mvf",
       "position": {
-        "x": 1284,
+        "x": 1236,
         "y": -216
       }
     },
@@ -392,8 +392,8 @@
       "fpEnabled": true,
       "id": "2SeIXdF3j",
       "position": {
-        "x": 1080,
-        "y": 144
+        "x": 864,
+        "y": 372
       }
     },
     {
@@ -404,8 +404,8 @@
       "fpEnabled": true,
       "id": "Zr27-EOGK",
       "position": {
-        "x": 1671.3648926273797,
-        "y": -370.0268808264862
+        "x": 2112,
+        "y": -396
       }
     },
     {
@@ -416,8 +416,8 @@
       "fpEnabled": true,
       "id": "iuUcLAzFB",
       "position": {
-        "x": 1287.915867526873,
-        "y": -368.9333738274651
+        "x": 1296,
+        "y": -408
       }
     },
     {
@@ -428,8 +428,8 @@
       "fpEnabled": true,
       "id": "6uPoPElzz",
       "position": {
-        "x": 1085.7490777191688,
-        "y": -369.4387836874358
+        "x": 1044,
+        "y": -396
       }
     },
     {
@@ -444,8 +444,8 @@
       "fpEnabled": true,
       "id": "gB6Va9cFe",
       "position": {
-        "x": 1672.052434352361,
-        "y": -303.036411100899
+        "x": 2112,
+        "y": -312
       }
     },
     {
@@ -700,8 +700,272 @@
       "fpEnabled": true,
       "id": "tsLoD_PyQ",
       "position": {
-        "x": 1380,
-        "y": 660
+        "x": 1344,
+        "y": 936
+      }
+    },
+    {
+      "name": "Fail if output larger than original",
+      "sourceRepo": "Local",
+      "pluginName": "checkFileNotBigger",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "SizeCheckFinal",
+      "position": {
+        "x": 1344,
+        "y": 996
+      }
+    },
+    {
+      "name": "Reset Error (Fallback to x265)",
+      "sourceRepo": "Community",
+      "pluginName": "resetFlowError",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "ResetErrX265",
+      "position": {
+        "x": 1560,
+        "y": 1044
+      }
+    },
+    {
+      "name": "Set Variable use_x265 🎯",
+      "sourceRepo": "Community",
+      "pluginName": "setFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "use_x265",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "SetUseX265",
+      "position": {
+        "x": 1560,
+        "y": 1152
+      }
+    },
+    {
+      "name": "Check use_x265 (P8) 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.use_x265}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "checkUseX265P8",
+      "position": {
+        "x": 876,
+        "y": -108
+      }
+    },
+    {
+      "name": "Begin x265 (P8)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265StartP8",
+      "position": {
+        "x": 768,
+        "y": 0
+      }
+    },
+    {
+      "name": "x265 - Encode HEVC (P8)",
+      "sourceRepo": "Local",
+      "pluginName": "x265EncodeHevc",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265EncP8",
+      "position": {
+        "x": 768,
+        "y": 60
+      }
+    },
+    {
+      "name": "Execute x265 (P8)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "x265ExecP8",
+      "position": {
+        "x": 768,
+        "y": 132
+      }
+    },
+    {
+      "name": "Check use_x265 (P7) 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.use_x265}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "checkUseX265P7",
+      "position": {
+        "x": 1236,
+        "y": -84
+      }
+    },
+    {
+      "name": "Begin x265 (P7)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265StartP7",
+      "position": {
+        "x": 1152,
+        "y": 0
+      }
+    },
+    {
+      "name": "x265 - Encode HEVC (P7)",
+      "sourceRepo": "Local",
+      "pluginName": "x265EncodeHevc",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265EncP7",
+      "position": {
+        "x": 1152,
+        "y": 60
+      }
+    },
+    {
+      "name": "Execute x265 (P7)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "x265ExecP7",
+      "position": {
+        "x": 1152,
+        "y": 132
+      }
+    },
+    {
+      "name": "Check use_x265 (P7 SL) 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.use_x265}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "checkUseX265P7S",
+      "position": {
+        "x": 1644,
+        "y": -72
+      }
+    },
+    {
+      "name": "Begin x265 (P7 SL)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265StartP7S",
+      "position": {
+        "x": 1536,
+        "y": 0
+      }
+    },
+    {
+      "name": "x265 - Encode HEVC (P7 SL)",
+      "sourceRepo": "Local",
+      "pluginName": "x265EncodeHevc",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265EncP7S",
+      "position": {
+        "x": 1536,
+        "y": 60
+      }
+    },
+    {
+      "name": "Execute x265 (P7 SL)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "x265ExecP7S",
+      "position": {
+        "x": 1536,
+        "y": 132
+      }
+    },
+    {
+      "name": "Check use_x265 (HDR10+) 🔍",
+      "sourceRepo": "Community",
+      "pluginName": "checkFlowVariable",
+      "version": "1.0.0",
+      "inputsDB": {
+        "variable": "{{{args.variables.user.use_x265}}} ",
+        "value": "true"
+      },
+      "fpEnabled": true,
+      "id": "checkUseX265HDR",
+      "position": {
+        "x": 2088,
+        "y": -84
+      }
+    },
+    {
+      "name": "Begin x265 (HDR10+)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandStart",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265StartHDR",
+      "position": {
+        "x": 1944,
+        "y": 0
+      }
+    },
+    {
+      "name": "x265 - Encode HEVC (HDR10+)",
+      "sourceRepo": "Local",
+      "pluginName": "x265EncodeHevc",
+      "version": "1.0.0",
+      "fpEnabled": true,
+      "id": "x265EncHDR",
+      "position": {
+        "x": 1944,
+        "y": 60
+      },
+      "inputsDB": {
+        "preset": "slow",
+        "crf": "18"
+      }
+    },
+    {
+      "name": "Execute x265 (HDR10+)",
+      "sourceRepo": "Community",
+      "pluginName": "ffmpegCommandExecute",
+      "version": "1.0.0",
+      "inputsDB": {
+        "dryRun": "false"
+      },
+      "fpEnabled": true,
+      "id": "x265ExecHDR",
+      "position": {
+        "x": 1944,
+        "y": 132
       }
     },
     {
@@ -712,8 +976,8 @@
       "fpEnabled": true,
       "id": "lC9xV8Swo",
       "position": {
-        "x": 1380,
-        "y": 216
+        "x": 1356,
+        "y": 456
       }
     },
     {
@@ -724,8 +988,8 @@
       "fpEnabled": true,
       "id": "WrpRawMkv",
       "position": {
-        "x": 1380,
-        "y": 276
+        "x": 1344,
+        "y": 552
       }
     },
     {
@@ -748,8 +1012,8 @@
       "fpEnabled": true,
       "id": "Ir6nzopNn",
       "position": {
-        "x": 1080,
-        "y": -216
+        "x": 876,
+        "y": -228
       }
     },
     {
@@ -763,8 +1027,8 @@
       "fpEnabled": true,
       "id": "O05LOTxgZ",
       "position": {
-        "x": 1380,
-        "y": 528
+        "x": 1344,
+        "y": 816
       }
     },
     {
@@ -779,8 +1043,8 @@
       "fpEnabled": true,
       "id": "ijOxQ9qo0",
       "position": {
-        "x": 1380,
-        "y": 396
+        "x": 1344,
+        "y": 684
       }
     },
     {
@@ -791,8 +1055,8 @@
       "fpEnabled": true,
       "id": "rtjmsjaZ2",
       "position": {
-        "x": 1380,
-        "y": 336
+        "x": 1344,
+        "y": 624
       }
     },
     {
@@ -819,8 +1083,8 @@
       "fpEnabled": true,
       "id": "zUQ42dg3v",
       "position": {
-        "x": 1085.9067186801562,
-        "y": -298.4837834555177
+        "x": 1032,
+        "y": -300
       }
     },
     {
@@ -903,8 +1167,8 @@
       "fpEnabled": true,
       "id": "ZF3nnux_N",
       "position": {
-        "x": 1380,
-        "y": 744
+        "x": 1344,
+        "y": 1140
       }
     },
     {
@@ -927,8 +1191,8 @@
       "fpEnabled": true,
       "id": "vzQ6rNJbq",
       "position": {
-        "x": 1490.838387353645,
-        "y": -1849.3665858917693
+        "x": 1488,
+        "y": -1800
       }
     },
     {
@@ -951,8 +1215,8 @@
       "fpEnabled": true,
       "id": "vUOzVHt9o",
       "position": {
-        "x": 1380,
-        "y": 468
+        "x": 1344,
+        "y": 756
       }
     },
     {
@@ -1014,8 +1278,8 @@
       "fpEnabled": true,
       "id": "6wLtjuPpX",
       "position": {
-        "x": 1883.247508495994,
-        "y": -250.97869841528043
+        "x": 2652,
+        "y": -204
       }
     },
     {
@@ -1062,7 +1326,7 @@
       "fpEnabled": true,
       "id": "Zy_hzDk19",
       "position": {
-        "x": 1284,
+        "x": 1236,
         "y": -156
       }
     },
@@ -1074,8 +1338,8 @@
       "fpEnabled": true,
       "id": "tpzWvVYop",
       "position": {
-        "x": 1488,
-        "y": -168
+        "x": 1644,
+        "y": -156
       }
     },
     {
@@ -1086,7 +1350,7 @@
       "fpEnabled": true,
       "id": "23DrvLYZ5",
       "position": {
-        "x": 1080,
+        "x": 876,
         "y": -156
       }
     },
@@ -1098,8 +1362,8 @@
       "fpEnabled": true,
       "id": "mT11Eua2J",
       "position": {
-        "x": 1680,
-        "y": -168
+        "x": 2088,
+        "y": -156
       }
     },
     {
@@ -1110,8 +1374,8 @@
       "fpEnabled": true,
       "id": "bO2_RoL9u",
       "position": {
-        "x": 1284,
-        "y": 24
+        "x": 1224,
+        "y": 228
       }
     },
     {
@@ -1122,8 +1386,8 @@
       "fpEnabled": true,
       "id": "ALl24BWfe",
       "position": {
-        "x": 1488,
-        "y": 24
+        "x": 1620,
+        "y": 228
       }
     },
     {
@@ -1134,8 +1398,8 @@
       "fpEnabled": true,
       "id": "lAKsc7QUZ",
       "position": {
-        "x": 1080,
-        "y": 24
+        "x": 864,
+        "y": 228
       }
     },
     {
@@ -1146,8 +1410,8 @@
       "fpEnabled": true,
       "id": "iZwguD20Q",
       "position": {
-        "x": 1680,
-        "y": 24
+        "x": 2100,
+        "y": 240
       }
     },
     {
@@ -1158,8 +1422,8 @@
       "fpEnabled": false,
       "id": "XXqSI9Yi8",
       "position": {
-        "x": 1284,
-        "y": 60
+        "x": 2484,
+        "y": 348
       }
     },
     {
@@ -1170,8 +1434,8 @@
       "fpEnabled": false,
       "id": "MVpCqWL6O",
       "position": {
-        "x": 1488,
-        "y": 72
+        "x": 2700,
+        "y": 348
       }
     },
     {
@@ -1182,8 +1446,8 @@
       "fpEnabled": false,
       "id": "09NmWSuU_",
       "position": {
-        "x": 1080,
-        "y": 60
+        "x": 2484,
+        "y": 468
       }
     },
     {
@@ -1194,8 +1458,8 @@
       "fpEnabled": false,
       "id": "ZYVItNiyZ",
       "position": {
-        "x": 1680,
-        "y": 60
+        "x": 2700,
+        "y": 468
       }
     },
     {
@@ -1218,8 +1482,8 @@
       "fpEnabled": true,
       "id": "ISAGN5272",
       "position": {
-        "x": 888,
-        "y": -180
+        "x": 480,
+        "y": -228
       }
     },
     {
@@ -1233,8 +1497,8 @@
       "fpEnabled": false,
       "id": "-9dZgoCI3",
       "position": {
-        "x": 1093.799376715666,
-        "y": -1121.3311241291876
+        "x": 1092,
+        "y": -1116
       }
     }
   ],
@@ -1431,9 +1695,9 @@
     {
       "source": "23DrvLYZ5",
       "sourceHandle": "1",
-      "target": "nvStartP8",
+      "target": "checkUseX265P8",
       "targetHandle": null,
-      "id": "P8_to_nvStart"
+      "id": "P8_to_checkUseX265"
     },
     {
       "source": "nvStartP8",
@@ -1459,9 +1723,9 @@
     {
       "source": "Zy_hzDk19",
       "sourceHandle": "1",
-      "target": "nvStartP7",
+      "target": "checkUseX265P7",
       "targetHandle": null,
-      "id": "P7_to_nvStart"
+      "id": "P7_to_checkUseX265"
     },
     {
       "source": "nvStartP7",
@@ -1487,9 +1751,9 @@
     {
       "source": "tpzWvVYop",
       "sourceHandle": "1",
-      "target": "nvStartP7S",
+      "target": "checkUseX265P7S",
       "targetHandle": null,
-      "id": "P7S_to_nvStart"
+      "id": "P7S_to_checkUseX265"
     },
     {
       "source": "nvStartP7S",
@@ -1515,9 +1779,9 @@
     {
       "source": "mT11Eua2J",
       "sourceHandle": "1",
-      "target": "nvStartHDR",
+      "target": "checkUseX265HDR",
       "targetHandle": null,
-      "id": "HDR_to_nvStart"
+      "id": "HDR_to_checkUseX265"
     },
     {
       "source": "nvStartHDR",
@@ -1851,9 +2115,9 @@
     {
       "source": "23DrvLYZ5",
       "sourceHandle": "1",
-      "target": "lAKsc7QUZ",
+      "target": "checkUseX265P8",
       "targetHandle": null,
-      "id": "HVZWI1_kT"
+      "id": "P8_to_checkUseX265"
     },
     {
       "source": "2PbPWJ2eF",
@@ -1872,9 +2136,9 @@
     {
       "source": "Zy_hzDk19",
       "sourceHandle": "1",
-      "target": "bO2_RoL9u",
+      "target": "checkUseX265P7",
       "targetHandle": null,
-      "id": "-lJhDM-ud"
+      "id": "P7_to_checkUseX265"
     },
     {
       "source": "bgs4syrr0",
@@ -1893,9 +2157,9 @@
     {
       "source": "tpzWvVYop",
       "sourceHandle": "1",
-      "target": "ALl24BWfe",
+      "target": "checkUseX265P7S",
       "targetHandle": null,
-      "id": "TEFvNfa_Y"
+      "id": "P7S_to_checkUseX265"
     },
     {
       "source": "gB6Va9cFe",
@@ -1914,9 +2178,9 @@
     {
       "source": "mT11Eua2J",
       "sourceHandle": "1",
-      "target": "iZwguD20Q",
+      "target": "checkUseX265HDR",
       "targetHandle": null,
-      "id": "0ar4rEZgM"
+      "id": "HDR_to_checkUseX265"
     },
     {
       "source": "vzQ6rNJbq",
@@ -1928,9 +2192,37 @@
     {
       "source": "tsLoD_PyQ",
       "sourceHandle": "1",
+      "target": "SizeCheckFinal",
+      "targetHandle": null,
+      "id": "tsToSizeCheckFinal"
+    },
+    {
+      "source": "SizeCheckFinal",
+      "sourceHandle": "1",
       "target": "ZF3nnux_N",
       "targetHandle": null,
-      "id": "c1Q8mRMgN"
+      "id": "sizeCheckFinalToReplace"
+    },
+    {
+      "source": "SizeCheckFinal",
+      "sourceHandle": "err1",
+      "target": "ResetErrX265",
+      "targetHandle": null,
+      "id": "sizeCheckFailToResetErrX265"
+    },
+    {
+      "source": "ResetErrX265",
+      "sourceHandle": "1",
+      "target": "SetUseX265",
+      "targetHandle": null,
+      "id": "resetErrX265ToSetUseX265"
+    },
+    {
+      "source": "SetUseX265",
+      "sourceHandle": "1",
+      "target": "vzQ6rNJbq",
+      "targetHandle": null,
+      "id": "setUseX265ToReplaceOriginal"
     },
     {
       "source": "FGLxLhenh",
@@ -1938,13 +2230,6 @@
       "target": "On2TUw8aQ",
       "targetHandle": null,
       "id": "0KmL2V9fo"
-    },
-    {
-      "source": "ISAGN5272",
-      "sourceHandle": "1",
-      "target": "lAKsc7QUZ",
-      "targetHandle": null,
-      "id": "3GG4NRBIe"
     },
     {
       "source": "D_agyMgni",
@@ -1987,6 +2272,146 @@
       "target": "zCh2Z_epA",
       "targetHandle": null,
       "id": "HomnkSbkk"
+    },
+    {
+      "source": "checkUseX265P8",
+      "sourceHandle": "1",
+      "target": "x265StartP8",
+      "targetHandle": null,
+      "id": "checkUseX265P8_true_to_x265Start"
+    },
+    {
+      "source": "checkUseX265P8",
+      "sourceHandle": "2",
+      "target": "nvStartP8",
+      "targetHandle": null,
+      "id": "checkUseX265P8_false_to_nvStart"
+    },
+    {
+      "source": "x265StartP8",
+      "sourceHandle": "1",
+      "target": "x265EncP8",
+      "targetHandle": null,
+      "id": "P8_x265Start_to_x265Enc"
+    },
+    {
+      "source": "x265EncP8",
+      "sourceHandle": "1",
+      "target": "x265ExecP8",
+      "targetHandle": null,
+      "id": "P8_x265Enc_to_x265Exec"
+    },
+    {
+      "source": "checkUseX265P7",
+      "sourceHandle": "1",
+      "target": "x265StartP7",
+      "targetHandle": null,
+      "id": "checkUseX265P7_true_to_x265Start"
+    },
+    {
+      "source": "checkUseX265P7",
+      "sourceHandle": "2",
+      "target": "nvStartP7",
+      "targetHandle": null,
+      "id": "checkUseX265P7_false_to_nvStart"
+    },
+    {
+      "source": "x265StartP7",
+      "sourceHandle": "1",
+      "target": "x265EncP7",
+      "targetHandle": null,
+      "id": "P7_x265Start_to_x265Enc"
+    },
+    {
+      "source": "x265EncP7",
+      "sourceHandle": "1",
+      "target": "x265ExecP7",
+      "targetHandle": null,
+      "id": "P7_x265Enc_to_x265Exec"
+    },
+    {
+      "source": "checkUseX265P7S",
+      "sourceHandle": "1",
+      "target": "x265StartP7S",
+      "targetHandle": null,
+      "id": "checkUseX265P7S_true_to_x265Start"
+    },
+    {
+      "source": "checkUseX265P7S",
+      "sourceHandle": "2",
+      "target": "nvStartP7S",
+      "targetHandle": null,
+      "id": "checkUseX265P7S_false_to_nvStart"
+    },
+    {
+      "source": "x265StartP7S",
+      "sourceHandle": "1",
+      "target": "x265EncP7S",
+      "targetHandle": null,
+      "id": "P7S_x265Start_to_x265Enc"
+    },
+    {
+      "source": "x265EncP7S",
+      "sourceHandle": "1",
+      "target": "x265ExecP7S",
+      "targetHandle": null,
+      "id": "P7S_x265Enc_to_x265Exec"
+    },
+    {
+      "source": "checkUseX265HDR",
+      "sourceHandle": "1",
+      "target": "x265StartHDR",
+      "targetHandle": null,
+      "id": "checkUseX265HDR_true_to_x265Start"
+    },
+    {
+      "source": "checkUseX265HDR",
+      "sourceHandle": "2",
+      "target": "nvStartHDR",
+      "targetHandle": null,
+      "id": "checkUseX265HDR_false_to_nvStart"
+    },
+    {
+      "source": "x265StartHDR",
+      "sourceHandle": "1",
+      "target": "x265EncHDR",
+      "targetHandle": null,
+      "id": "HDR_x265Start_to_x265Enc"
+    },
+    {
+      "source": "x265EncHDR",
+      "sourceHandle": "1",
+      "target": "x265ExecHDR",
+      "targetHandle": null,
+      "id": "HDR_x265Enc_to_x265Exec"
+    },
+    {
+      "source": "x265ExecP8",
+      "sourceHandle": "1",
+      "target": "lAKsc7QUZ",
+      "targetHandle": null,
+      "id": "x265_P8_nvExec_to_inject"
+    },
+    {
+      "source": "x265ExecP7",
+      "sourceHandle": "1",
+      "target": "bO2_RoL9u",
+      "targetHandle": null,
+      "id": "x265_P7_nvExec_to_inject"
+    },
+    {
+      "source": "x265ExecP7S",
+      "sourceHandle": "1",
+      "target": "ALl24BWfe",
+      "targetHandle": null,
+      "id": "x265_P7S_nvExec_to_inject"
+    },
+    {
+      "source": "x265ExecHDR",
+      "sourceHandle": "1",
+      "target": "iZwguD20Q",
+      "targetHandle": null,
+      "id": "x265_HDR_nvExec_to_inject"
     }
   ]
 }

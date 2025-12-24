@@ -98,17 +98,65 @@ Below is a quick summary of each plugin used in the flow. Many are adapted from 
    - Uses `-c copy` for all streams to avoid re-encoding. All audio codecs (including TrueHD/DTS-HD) are preserved.  
    - Final container is MKV; original file is replaced with the new MKV.
 
+9. **Size Check & Software Fallback**  
+   - After the final remux, the flow checks if the output file is larger than the original.
+   - If the output is larger, the flow automatically restarts with **x265 software encoding** instead of NVENC.
+   - This ensures you always get the smallest possible file without sacrificing quality.
+
+---
+
+## NVENC vs x265 Encoding Strategy
+
+The flow uses a **two-tier encoding approach** to balance speed and file size:
+
+### Primary Path: NVENC (Hardware Encoding)
+- **Fast**: Uses hardware acceleration for quick encoding
+- **Efficient**: Works well for most files, achieving ~60% size reduction
+- **Adaptive bitrate**: Automatically calculates target bitrate based on source
+- **HDR preservation**: Maintains all color metadata, mastering display, and MaxCLL
+
+### Fallback Path: x265 (Software Encoding)
+- **Triggered automatically** if NVENC output is larger than the original file
+- **Better compression**: Uses slower presets (default: `slow`, CRF 18) for maximum quality per bit
+- **Same quality settings**: Preserves all HDR metadata identically to NVENC
+- **Re-reads original**: Restarts from the original library file to ensure clean source
+
+### How the Fallback Works
+1. File completes NVENC encoding and remux
+2. `checkFileNotBigger` plugin compares output size to original
+3. If output > original:
+   - Error is caught and reset
+   - `use_x265` variable is set to `true`
+   - Flow restarts from the beginning
+4. On restart, `checkUseX265` nodes detect the variable and route to x265 branches
+5. x265 re-encodes from the original source with software compression
+6. Final output is guaranteed to be smaller (or same quality if already optimal)
+
+### Configuration
+Both NVENC and x265 paths use the same default quality settings:
+- **CRF**: 18 (lower = better quality, range 0-51)
+- **Preset**: 
+  - NVENC: `p7` (highest quality hardware preset)
+  - x265: `slow` (balanced speed/compression)
+- **Pixel format**: `p010le` (10-bit)
+- **HDR params**: BT.2020 color primaries, SMPTE 2084 transfer, mastering display, MaxCLL
+- **Adaptive bitrate**: 60% of source (with 1.5x maxrate buffer)
+
+You can adjust these in the flow nodes if needed.
+
 ---
 
 ## Common Flows
 
 **Short version**:  
-[Input File] → [Extract raw HEVC stream] → [Extract Dolby Vision RPU] → [NVENC re-encode HEVC with HDR fallback preserved] → [Inject DV RPU] → [Wrap with mkvmerge (video-only MKV)] → [Remux with ffmpeg (video from wrapped MKV + audio/subs/chapters from original)]
+[Input File] → [Extract raw HEVC stream] → [Extract Dolby Vision RPU] → [NVENC re-encode HEVC with HDR fallback preserved] → [Inject DV RPU] → [Wrap with mkvmerge (video-only MKV)] → [Remux with ffmpeg (video from wrapped MKV + audio/subs/chapters from original)] → **[Size Check]** → [Replace Original] or [Restart with x265]
 
 **Key points:**
 - **Profile preservation**: Profile 7 inputs produce Profile 7 outputs; Profile 8 inputs produce Profile 8 outputs. No implicit conversion.
 - **HDR10+ lane**: Only the HDR10+ branch converts to DV Profile 8 via `injectHdr10toDoVi8`.
 - **NVENC encoding**: Adaptive bitrate with HDR metadata (color primaries, transfer, mastering display, MaxCLL) preserved via `-master-display` and `-max-cll`.
+- **x265 fallback**: If NVENC output is larger, flow automatically restarts with x265 software encoding from the original file.
+- **Size guarantee**: Final output is always smaller than or equal to the original file size.
 - **Wrapping step**: `mkvmerge` creates a video-only MKV with timestamps to protect DV NALs before final remux.
 - **Final remux**: Maps video from wrapped MKV (`-map 0:v`) and audio/subs/chapters/metadata from original file (`-map 1:a`, `-map 1:s?`, `-map_chapters 1`, `-map_metadata 1`).
   
