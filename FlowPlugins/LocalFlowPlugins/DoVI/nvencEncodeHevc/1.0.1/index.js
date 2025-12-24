@@ -188,7 +188,7 @@ const plugin = (args) => {
     if (args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true') {
         streamOutputArgs.push('-bf', '5', '-b_ref_mode', 'each');
     }
-    streamOutputArgs.push('-spatial_aq', '1', '-temporal-aq', '1', '-rc-lookahead', '32', '-tune', 'hq');
+    streamOutputArgs.push('-spatial_aq', '1', '-temporal-aq', '1', '-rc-lookahead', '32', '-tune', 'hq', '-strict_gop', '1');
     streamOutputArgs.push('-pix_fmt', 'p010le', '-profile:v', 'main10');
     if (adaptiveBitrate) {
         streamOutputArgs.push(

@@ -60,7 +60,7 @@ const details = () => ({
             label: 'x265 Extra Params',
             name: 'x265_params',
             type: 'string',
-            defaultValue: 'profile=main10:hdr10=1:colorprim=bt2020:transfer=arib-std-b67:colormatrix=bt2020nc',
+            defaultValue: 'profile=main10:hdr10=1:hdr10-opt=1:colorprim=bt2020:transfer=arib-std-b67:colormatrix=bt2020nc',
             inputUI: {
                 type: 'text',
             },
