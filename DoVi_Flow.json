@@ -572,8 +572,8 @@
       "fpEnabled": true,
       "id": "D_agyMgni",
       "position": {
-        "x": 1095.3380578659037,
-        "y": -1238.999262904801
+        "x": 1080,
+        "y": -1260
       }
     },
     {
@@ -942,15 +942,15 @@
       "sourceRepo": "Local",
       "pluginName": "x265EncodeHevc",
       "version": "1.0.0",
+      "inputsDB": {
+        "preset": "slow",
+        "crf": "18"
+      },
       "fpEnabled": true,
       "id": "x265EncHDR",
       "position": {
         "x": 1944,
         "y": 60
-      },
-      "inputsDB": {
-        "preset": "slow",
-        "crf": "18"
       }
     },
     {
@@ -1484,21 +1484,6 @@
       "position": {
         "x": 480,
         "y": -228
-      }
-    },
-    {
-      "name": "Check if MP4 (DISABLED for MKV workflow)",
-      "sourceRepo": "Community",
-      "pluginName": "checkFileExtension",
-      "version": "1.0.0",
-      "inputsDB": {
-        "extensions": "mp4"
-      },
-      "fpEnabled": false,
-      "id": "-9dZgoCI3",
-      "position": {
-        "x": 1092,
-        "y": -1116
       }
     }
   ],
@@ -2232,46 +2217,11 @@
       "id": "0KmL2V9fo"
     },
     {
-      "source": "D_agyMgni",
-      "sourceHandle": "1",
-      "target": "-9dZgoCI3",
-      "targetHandle": null,
-      "id": "6qMAd6OzC"
-    },
-    {
-      "source": "PgWDieyHy",
-      "sourceHandle": "1",
-      "target": "-9dZgoCI3",
-      "targetHandle": null,
-      "id": "nhRN29lsU"
-    },
-    {
-      "source": "Kx3p8sBBM",
-      "sourceHandle": "1",
-      "target": "-9dZgoCI3",
-      "targetHandle": null,
-      "id": "4GcKiVStj"
-    },
-    {
       "source": "nuscvjdso",
       "sourceHandle": "1",
       "target": "SBJlBuz0d",
       "targetHandle": null,
       "id": "FiNM4N32o"
-    },
-    {
-      "source": "-9dZgoCI3",
-      "sourceHandle": "2",
-      "target": "fMGEd1hQ5",
-      "targetHandle": null,
-      "id": "ZG2Wfhm6L"
-    },
-    {
-      "source": "-9dZgoCI3",
-      "sourceHandle": "1",
-      "target": "zCh2Z_epA",
-      "targetHandle": null,
-      "id": "HomnkSbkk"
     },
     {
       "source": "checkUseX265P8",
@@ -2412,6 +2362,27 @@
       "target": "iZwguD20Q",
       "targetHandle": null,
       "id": "x265_HDR_nvExec_to_inject"
+    },
+    {
+      "source": "Kx3p8sBBM",
+      "sourceHandle": "1",
+      "target": "fMGEd1hQ5",
+      "targetHandle": null,
+      "id": "EXGxDOCYN"
+    },
+    {
+      "source": "PgWDieyHy",
+      "sourceHandle": "1",
+      "target": "fMGEd1hQ5",
+      "targetHandle": null,
+      "id": "n7ml7WHhm"
+    },
+    {
+      "source": "D_agyMgni",
+      "sourceHandle": "1",
+      "target": "fMGEd1hQ5",
+      "targetHandle": null,
+      "id": "RbsEphYP2"
     }
   ]
 }
