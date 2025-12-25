@@ -173,18 +173,6 @@
       }
     },
     {
-      "name": "EXIT - FILE is already MKV and PROFILE 4/5 or 8, should not need further processing. Disable if filter if bypassing to re-encode",
-      "sourceRepo": "Community",
-      "pluginName": "comment",
-      "version": "1.0.0",
-      "fpEnabled": true,
-      "id": "zCh2Z_epA",
-      "position": {
-        "x": 826.916857122066,
-        "y": -1026.5702047797508
-      }
-    },
-    {
       "name": "DoVi Stage 3 Complete ✅",
       "sourceRepo": "Community",
       "pluginName": "comment",

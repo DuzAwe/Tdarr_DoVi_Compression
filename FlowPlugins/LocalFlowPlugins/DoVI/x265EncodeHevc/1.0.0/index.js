@@ -108,25 +108,66 @@ const plugin = (args) => {
     }
 
     // Calculate bitrate and encode parameters BEFORE building output args
+    // Robust duration detection
     let durationSeconds = 0;
     try {
-        if (parseFloat(args.inputFileObj.ffProbeData?.format?.duration) > 0) {
-            durationSeconds = parseFloat(args.inputFileObj.ffProbeData.format.duration);
+        const fmtDur = parseFloat(args.inputFileObj.ffProbeData?.format?.duration);
+        if (fmtDur && fmtDur > 0) {
+            durationSeconds = fmtDur;
         } else if (videoStream.duration && parseFloat(videoStream.duration) > 0) {
             durationSeconds = parseFloat(videoStream.duration);
+        } else if (videoStream.tags?.DURATION) {
+            // Parse tag DURATION like 00:40:32.680000000
+            const parts = String(videoStream.tags.DURATION).split(':');
+            if (parts.length >= 3) {
+                const h = parseFloat(parts[0]) || 0;
+                const m = parseFloat(parts[1]) || 0;
+                const s = parseFloat(parts[2]) || 0;
+                durationSeconds = (h * 3600) + (m * 60) + s;
+            }
         }
     } catch (e) {
         // Fallback handled below
     }
 
+    // Robust bitrate detection (bps)
     let bitRateBps = 0;
     try {
+        // 1) Direct stream bitrate
         if (videoStream.bit_rate && Number(videoStream.bit_rate) > 0) {
             bitRateBps = Number(videoStream.bit_rate);
-        } else if (args.inputFileObj.file_size && durationSeconds > 0) {
-            bitRateBps = (Number(args.inputFileObj.file_size) * 8) / durationSeconds;
-        } else if (args.inputFileObj.ffProbeData?.format?.bit_rate && Number(args.inputFileObj.ffProbeData.format.bit_rate) > 0) {
+            args.jobLog(`Bitrate source: videoStream.bit_rate=${bitRateBps}`);
+        }
+        // 2) ffprobe format bitrate
+        else if (args.inputFileObj.ffProbeData?.format?.bit_rate && Number(args.inputFileObj.ffProbeData.format.bit_rate) > 0) {
             bitRateBps = Number(args.inputFileObj.ffProbeData.format.bit_rate);
+            args.jobLog(`Bitrate source: format.bit_rate=${bitRateBps}`);
+        }
+        // 3) ffprobe stream tag BPS (already in bps)
+        else if (videoStream.tags?.BPS && Number(videoStream.tags.BPS) > 0) {
+            bitRateBps = Number(videoStream.tags.BPS);
+            args.jobLog(`Bitrate source: tags.BPS=${bitRateBps}`);
+        }
+        // 4) Compute from format.size (bytes) + duration
+        else if (Number(args.inputFileObj.ffProbeData?.format?.size) > 0 && durationSeconds > 0) {
+            const bytes = Number(args.inputFileObj.ffProbeData.format.size);
+            bitRateBps = Math.round((bytes * 8) / durationSeconds);
+            args.jobLog(`Bitrate source: format.size bytes=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
+        }
+        // 5) Compute from stream tags NUMBER_OF_BYTES + DURATION
+        else if (videoStream.tags?.NUMBER_OF_BYTES && durationSeconds > 0) {
+            const bytes = Number(videoStream.tags.NUMBER_OF_BYTES);
+            if (bytes > 0) {
+                bitRateBps = Math.round((bytes * 8) / durationSeconds);
+                args.jobLog(`Bitrate source: tags.NUMBER_OF_BYTES=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
+            }
+        }
+        // 6) Compute from inputFileObj.file_size (MB) + duration
+        else if (args.inputFileObj.file_size && durationSeconds > 0) {
+            // Tdarr inputFileObj.file_size is MB; convert to bytes
+            const bytes = Number(args.inputFileObj.file_size) * 1_000_000;
+            bitRateBps = Math.round((bytes * 8) / durationSeconds);
+            args.jobLog(`Bitrate source: file_sizeMB=${args.inputFileObj.file_size} duration=${durationSeconds}s => ${bitRateBps}bps`);
         }
     } catch (e) {
         // Will fall back to CRF-only if still 0
