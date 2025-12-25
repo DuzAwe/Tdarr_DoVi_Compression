@@ -98,28 +98,145 @@ const plugin = (args) => {
     }
 
     // Calculate bitrate and encode parameters BEFORE building output args
+    // Robust duration detection
     let durationSeconds = 0;
     try {
-        if (parseFloat(args.inputFileObj.ffProbeData?.format?.duration) > 0) {
-            durationSeconds = parseFloat(args.inputFileObj.ffProbeData.format.duration);
-        } else if (videoStream.duration && parseFloat(videoStream.duration) > 0) {
+        // Check for original library file metadata (before extraction)
+        args.jobLog(`[DEBUG] Checking original file availability:`);
+        args.jobLog(`  - args.originalLibraryFile exists: ${!!args.originalLibraryFile}`);
+        if (args.originalLibraryFile?.ffProbeData) {
+            args.jobLog(`  - originalLibraryFile.ffProbeData.format.duration: ${args.originalLibraryFile.ffProbeData.format?.duration || 'undefined'}`);
+            args.jobLog(`  - originalLibraryFile.ffProbeData.format.bit_rate: ${args.originalLibraryFile.ffProbeData.format?.bit_rate || 'undefined'}`);
+            const origVideoStream = (args.originalLibraryFile.ffProbeData.streams || []).find(s => s.codec_type === 'video');
+            if (origVideoStream) {
+                args.jobLog(`  - originalLibraryFile video.bit_rate: ${origVideoStream.bit_rate || 'undefined'}`);
+            }
+        }
+        args.jobLog(`  - args.variables.original_bitrate: ${args.variables?.original_bitrate || 'undefined'}`);
+        args.jobLog(`  - args.variables.original_duration: ${args.variables?.original_duration || 'undefined'}`);
+
+        args.jobLog(`[DEBUG] Checking duration sources:`);
+        args.jobLog(`  - format.duration: ${args.inputFileObj.ffProbeData?.format?.duration || 'undefined'}`);
+        args.jobLog(`  - videoStream.duration: ${videoStream.duration || 'undefined'}`);
+        args.jobLog(`  - videoStream.tags.DURATION: ${videoStream.tags?.DURATION || 'undefined'}`);
+        args.jobLog(`  - videoStream.nb_frames: ${videoStream.nb_frames || 'undefined'}`);
+        args.jobLog(`  - videoStream.r_frame_rate: ${videoStream.r_frame_rate || 'undefined'}`);
+        args.jobLog(`  - videoStream.avg_frame_rate: ${videoStream.avg_frame_rate || 'undefined'}`);
+
+        // 1) Try original library file first (pre-extraction)
+        const origDur = parseFloat(args.originalLibraryFile?.ffProbeData?.format?.duration);
+        if (origDur && origDur > 0) {
+            durationSeconds = origDur;
+            args.jobLog(`Duration source: originalLibraryFile.format.duration=${durationSeconds}s`);
+        }
+        // 2) Current file format duration
+        else {
+            const fmtDur = parseFloat(args.inputFileObj.ffProbeData?.format?.duration);
+            if (fmtDur && fmtDur > 0) {
+                durationSeconds = fmtDur;
+                args.jobLog(`Duration source: format.duration=${durationSeconds}s`);
+            }
+        }
+        // 3) Video stream duration
+        if (durationSeconds === 0 && videoStream.duration && parseFloat(videoStream.duration) > 0) {
             durationSeconds = parseFloat(videoStream.duration);
+            args.jobLog(`Duration source: videoStream.duration=${durationSeconds}s`);
+        } else if (videoStream.tags?.DURATION) {
+            // Parse tag DURATION like 00:40:32.680000000
+            const parts = String(videoStream.tags.DURATION).split(':');
+            if (parts.length >= 3) {
+                const h = parseFloat(parts[0]) || 0;
+                const m = parseFloat(parts[1]) || 0;
+                const s = parseFloat(parts[2]) || 0;
+                durationSeconds = (h * 3600) + (m * 60) + s;
+                args.jobLog(`Duration source: tags.DURATION=${durationSeconds}s`);
+            }
+        }
+        // Frame-based fallback for raw streams
+        if (durationSeconds === 0 && videoStream.nb_frames && videoStream.r_frame_rate) {
+            const frames = parseInt(videoStream.nb_frames, 10);
+            const fpsMatch = String(videoStream.r_frame_rate).match(/(\d+)\/(\d+)/);
+            if (fpsMatch && frames > 0) {
+                const fps = parseInt(fpsMatch[1], 10) / parseInt(fpsMatch[2], 10);
+                if (fps > 0) {
+                    durationSeconds = frames / fps;
+                    args.jobLog(`Duration source: nb_frames=${frames} / fps=${fps.toFixed(3)} = ${durationSeconds.toFixed(2)}s`);
+                }
+            }
+        }
+        // Fallback to avg_frame_rate if r_frame_rate didn't work
+        if (durationSeconds === 0 && videoStream.nb_frames && videoStream.avg_frame_rate) {
+            const frames = parseInt(videoStream.nb_frames, 10);
+            const fpsMatch = String(videoStream.avg_frame_rate).match(/(\d+)\/(\d+)/);
+            if (fpsMatch && frames > 0) {
+                const fps = parseInt(fpsMatch[1], 10) / parseInt(fpsMatch[2], 10);
+                if (fps > 0) {
+                    durationSeconds = frames / fps;
+                    args.jobLog(`Duration source: nb_frames=${frames} / avg_fps=${fps.toFixed(3)} = ${durationSeconds.toFixed(2)}s`);
+                }
+            }
         }
     } catch (e) {
-        // Fallback handled below
+        args.jobLog(`[ERROR] Duration detection failed: ${e.message}`);
     }
 
+    // Robust bitrate detection (bps)
     let bitRateBps = 0;
     try {
-        if (videoStream.bit_rate && Number(videoStream.bit_rate) > 0) {
+        // Debug: Log available metadata
+        args.jobLog(`[DEBUG] Checking bitrate sources:`);
+        args.jobLog(`  - videoStream.bit_rate: ${videoStream.bit_rate || 'undefined'}`);
+        args.jobLog(`  - format.bit_rate: ${args.inputFileObj.ffProbeData?.format?.bit_rate || 'undefined'}`);
+        args.jobLog(`  - videoStream.tags.BPS: ${videoStream.tags?.BPS || 'undefined'}`);
+        args.jobLog(`  - format.size: ${args.inputFileObj.ffProbeData?.format?.size || 'undefined'}`);
+        args.jobLog(`  - videoStream.tags.NUMBER_OF_BYTES: ${videoStream.tags?.NUMBER_OF_BYTES || 'undefined'}`);
+        args.jobLog(`  - inputFileObj.file_size(MB): ${args.inputFileObj.file_size || 'undefined'}`);
+        args.jobLog(`  - durationSeconds: ${durationSeconds}`);
+
+        // 1) Try original library file bitrate first (pre-extraction)
+        const origBitrate = Number(args.originalLibraryFile?.ffProbeData?.format?.bit_rate);
+        if (origBitrate > 0) {
+            bitRateBps = origBitrate;
+            args.jobLog(`Bitrate source: originalLibraryFile.format.bit_rate=${bitRateBps}`);
+        }
+        // 2) Direct stream bitrate
+        else if (videoStream.bit_rate && Number(videoStream.bit_rate) > 0) {
             bitRateBps = Number(videoStream.bit_rate);
-        } else if (args.inputFileObj.file_size && durationSeconds > 0) {
-            bitRateBps = (Number(args.inputFileObj.file_size) * 8) / durationSeconds;
-        } else if (args.inputFileObj.ffProbeData?.format?.bit_rate && Number(args.inputFileObj.ffProbeData.format.bit_rate) > 0) {
+            args.jobLog(`Bitrate source: videoStream.bit_rate=${bitRateBps}`);
+        }
+        // 3) ffprobe format bitrate
+        else if (args.inputFileObj.ffProbeData?.format?.bit_rate && Number(args.inputFileObj.ffProbeData.format.bit_rate) > 0) {
             bitRateBps = Number(args.inputFileObj.ffProbeData.format.bit_rate);
+            args.jobLog(`Bitrate source: format.bit_rate=${bitRateBps}`);
+        }
+        // 4) ffprobe stream tag BPS (already in bps)
+        else if (videoStream.tags?.BPS && Number(videoStream.tags.BPS) > 0) {
+            bitRateBps = Number(videoStream.tags.BPS);
+            args.jobLog(`Bitrate source: tags.BPS=${bitRateBps}`);
+        }
+        // 5) Compute from format.size (bytes) + duration
+        else if (Number(args.inputFileObj.ffProbeData?.format?.size) > 0 && durationSeconds > 0) {
+            const bytes = Number(args.inputFileObj.ffProbeData.format.size);
+            bitRateBps = Math.round((bytes * 8) / durationSeconds);
+            args.jobLog(`Bitrate source: format.size bytes=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
+        }
+        // 6) Compute from stream tags NUMBER_OF_BYTES + DURATION
+        else if (videoStream.tags?.NUMBER_OF_BYTES && durationSeconds > 0) {
+            const bytes = Number(videoStream.tags.NUMBER_OF_BYTES);
+            if (bytes > 0) {
+                bitRateBps = Math.round((bytes * 8) / durationSeconds);
+                args.jobLog(`Bitrate source: tags.NUMBER_OF_BYTES=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
+            }
+        }
+        // 7) Compute from inputFileObj.file_size (MB) + duration
+        else if (args.inputFileObj.file_size && durationSeconds > 0) {
+            // Tdarr inputFileObj.file_size is MB; convert to bytes
+            const bytes = Number(args.inputFileObj.file_size) * 1_000_000;
+            bitRateBps = Math.round((bytes * 8) / durationSeconds);
+            args.jobLog(`Bitrate source: file_sizeMB=${args.inputFileObj.file_size} duration=${durationSeconds}s => ${bitRateBps}bps`);
         }
     } catch (e) {
-        // Will fall back to CQ-only if still 0
+        args.jobLog(`[ERROR] NVENC bitrate detection failed: ${e.message}`);
     }
 
     const currentBitrate = bitRateBps ? Math.round(bitRateBps / 1000) : 0;
@@ -195,7 +312,7 @@ const plugin = (args) => {
             '-b:v', `${targetBitrate}k`,
             '-minrate', `${minimumBitrate}k`,
             '-maxrate', `${maximumBitrate}k`,
-            '-bufsize', `${currentBitrate}k`
+            '-bufsize', `${Math.round(maximumBitrate * 2)}k`
         );
     }
     streamOutputArgs.push('-color_primaries', ffPrimaries, '-color_trc', ffTrc, '-colorspace', ffSpace);
@@ -226,7 +343,7 @@ const plugin = (args) => {
     const globalOutputArgs = ['-fps_mode', 'passthrough', '-map', '0:v', '-an', '-f', 'hevc'];
 
     if (adaptiveBitrate) {
-        args.jobLog(`NVENC encoding (adaptive): cq=${cq} current=${currentBitrate}k target=${targetBitrate}k min=${minimumBitrate}k max=${maximumBitrate}k`);
+        args.jobLog(`NVENC encoding (adaptive): cq=${cq} current=${currentBitrate}k target=${targetBitrate}k min=${minimumBitrate}k max=${maximumBitrate}k bufsize=${Math.round(maximumBitrate * 2)}k`);
     } else {
         args.jobLog(`NVENC encoding (CQ-only): cq=${cq} rc=vbr`);
     }
