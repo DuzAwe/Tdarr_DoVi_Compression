@@ -56,6 +56,26 @@ const details = () => ({
             },
             tooltip: 'Skip encoding if current bitrate below this value (empty = always encode)',
         },
+        {
+            label: 'Min Rate Multiplier',
+            name: 'min_multiplier',
+            type: 'string',
+            defaultValue: '0.8',
+            inputUI: {
+                type: 'text',
+            },
+            tooltip: 'Minimum bitrate as fraction of target (e.g. 0.8 = 80%)',
+        },
+        {
+            label: 'Max Rate Multiplier',
+            name: 'max_multiplier',
+            type: 'string',
+            defaultValue: '1.5',
+            inputUI: {
+                type: 'text',
+            },
+            tooltip: 'Maximum bitrate as fraction of target (e.g. 1.5 = 150%)',
+        },
     ],
     outputs: [
         {
@@ -265,8 +285,12 @@ const plugin = (args) => {
     if (adaptiveBitrate) {
         const reductionFactor = parseFloat(args.inputs.bitrate_reduction) || 0.6;
         targetBitrate = Math.round(currentBitrate * reductionFactor);
-        minimumBitrate = Math.round(targetBitrate * 0.7);
-        maximumBitrate = Math.round(targetBitrate * 1.3);
+        const minMult = parseFloat(args.inputs.min_multiplier);
+        const maxMult = parseFloat(args.inputs.max_multiplier);
+        const minMultiplier = (!Number.isNaN(minMult) && minMult > 0) ? minMult : 0.8;
+        const maxMultiplier = (!Number.isNaN(maxMult) && maxMult > 0) ? maxMult : 1.5;
+        minimumBitrate = Math.round(targetBitrate * minMultiplier);
+        maximumBitrate = Math.round(targetBitrate * maxMultiplier);
     }
 
     // Extract HDR metadata and color properties

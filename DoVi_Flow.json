@@ -38,6 +38,10 @@
       "position": {
         "x": 972,
         "y": 60
+      },
+      "inputsDB": {
+        "cq": "18",
+        "enable_bframes": "true"
       }
     },
     {
@@ -77,6 +81,10 @@
       "position": {
         "x": 1332,
         "y": 60
+      },
+      "inputsDB": {
+        "cq": "18",
+        "enable_bframes": "true"
       }
     },
     {
@@ -116,6 +124,10 @@
       "position": {
         "x": 1764,
         "y": 60
+      },
+      "inputsDB": {
+        "cq": "18",
+        "enable_bframes": "true"
       }
     },
     {
@@ -155,6 +167,10 @@
       "position": {
         "x": 2268,
         "y": 60
+      },
+      "inputsDB": {
+        "cq": "18",
+        "enable_bframes": "true"
       }
     },
     {
