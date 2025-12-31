@@ -64,7 +64,7 @@ const details = () => ({
             inputUI: {
                 type: 'text',
             },
-            tooltip: 'Minimum bitrate as fraction of target (e.g. 0.8 = 80%)',
+            tooltip: 'Minimum bitrate as fraction of target (0.8 = 80%). Tighter range improves compression consistency.',
         },
         {
             label: 'Max Rate Multiplier',
@@ -75,6 +75,17 @@ const details = () => ({
                 type: 'text',
             },
             tooltip: 'Maximum bitrate as fraction of target (e.g. 1.5 = 150%)',
+        },
+        {
+            label: 'Enable Multipass',
+            name: 'enable_multipass',
+            type: 'boolean',
+            defaultValue: true,
+            inputUI: {
+                type: 'dropdown',
+                options: ['false', 'true'],
+            },
+            tooltip: 'Use two-pass encoding for better rate control (fullres). ~2× encode time, 10-15% size reduction. Recommended.',
         },
     ],
     outputs: [
@@ -213,11 +224,11 @@ const plugin = (args) => {
         args.jobLog(`  - inputFileObj.file_size(MB): ${args.inputFileObj.file_size || 'undefined'}`);
         args.jobLog(`  - durationSeconds: ${durationSeconds}`);
 
-        // 1) Try original library file bitrate first (pre-extraction)
-        const origBitrate = Number(args.originalLibraryFile?.ffProbeData?.format?.bit_rate);
-        if (origBitrate > 0) {
-            bitRateBps = origBitrate;
-            args.jobLog(`Bitrate source: originalLibraryFile.format.bit_rate=${bitRateBps}`);
+        // 1) Prioritize extracted stream size (video-only bitrate)
+        if (Number(args.inputFileObj.ffProbeData?.format?.size) > 0 && durationSeconds > 0) {
+            const bytes = Number(args.inputFileObj.ffProbeData.format.size);
+            bitRateBps = Math.round((bytes * 8) / durationSeconds);
+            args.jobLog(`Bitrate source: format.size bytes=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
         }
         // 2) Direct stream bitrate
         else if (videoStream.bit_rate && Number(videoStream.bit_rate) > 0) {
@@ -234,13 +245,7 @@ const plugin = (args) => {
             bitRateBps = Number(videoStream.tags.BPS);
             args.jobLog(`Bitrate source: tags.BPS=${bitRateBps}`);
         }
-        // 5) Compute from format.size (bytes) + duration
-        else if (Number(args.inputFileObj.ffProbeData?.format?.size) > 0 && durationSeconds > 0) {
-            const bytes = Number(args.inputFileObj.ffProbeData.format.size);
-            bitRateBps = Math.round((bytes * 8) / durationSeconds);
-            args.jobLog(`Bitrate source: format.size bytes=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
-        }
-        // 6) Compute from stream tags NUMBER_OF_BYTES + DURATION
+        // 5) Compute from stream tags NUMBER_OF_BYTES + DURATION
         else if (videoStream.tags?.NUMBER_OF_BYTES && durationSeconds > 0) {
             const bytes = Number(videoStream.tags.NUMBER_OF_BYTES);
             if (bytes > 0) {
@@ -248,12 +253,20 @@ const plugin = (args) => {
                 args.jobLog(`Bitrate source: tags.NUMBER_OF_BYTES=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
             }
         }
-        // 7) Compute from inputFileObj.file_size (MB) + duration
+        // 6) Compute from inputFileObj.file_size (MB) + duration
         else if (args.inputFileObj.file_size && durationSeconds > 0) {
             // Tdarr inputFileObj.file_size is MB; convert to bytes
             const bytes = Number(args.inputFileObj.file_size) * 1_000_000;
             bitRateBps = Math.round((bytes * 8) / durationSeconds);
             args.jobLog(`Bitrate source: file_sizeMB=${args.inputFileObj.file_size} duration=${durationSeconds}s => ${bitRateBps}bps`);
+        }
+        // 7) Fallback to original library container bitrate (includes audio/subs)
+        else {
+            const origBitrate = Number(args.originalLibraryFile?.ffProbeData?.format?.bit_rate);
+            if (origBitrate > 0) {
+                bitRateBps = origBitrate;
+                args.jobLog(`Bitrate source: originalLibraryFile.format.bit_rate=${bitRateBps} (container bitrate, includes audio)`);
+            }
         }
     } catch (e) {
         args.jobLog(`[ERROR] NVENC bitrate detection failed: ${e.message}`);
@@ -329,7 +342,20 @@ const plugin = (args) => {
     if (args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true') {
         streamOutputArgs.push('-bf', '5', '-b_ref_mode', 'each');
     }
-    streamOutputArgs.push('-spatial_aq', '1', '-temporal-aq', '1', '-rc-lookahead', '32', '-tune', 'hq', '-strict_gop', '1');
+    
+    streamOutputArgs.push('-g', '600', '-keyint_min', '600', '-rc-lookahead', '32', '-tune', 'hq', '-strict_gop', '1');
+    
+    // Add multipass if enabled
+    if (args.inputs.enable_multipass === true || args.inputs.enable_multipass === 'true') {
+        streamOutputArgs.push('-multipass', 'fullres');
+    }
+
+    // Weighted prediction is not supported with B-frames on NVENC HEVC
+    // Only enable when B-frames are disabled
+    if (!(args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true')) {
+        streamOutputArgs.push('-weighted_pred', '1');
+    }
+    
     streamOutputArgs.push('-pix_fmt', 'p010le', '-profile:v', 'main10');
     if (adaptiveBitrate) {
         streamOutputArgs.push(

@@ -114,12 +114,17 @@ The flow uses a **two-tier encoding approach** to balance speed and file size:
 - **Efficient**: Works well for most files, achieving ~60% size reduction
 - **Adaptive bitrate**: Automatically calculates target bitrate based on source
 - **HDR preservation**: Maintains all color metadata, mastering display, and MaxCLL
+- **Fixed GOP**: Enforces `-g 600 -keyint_min 600` with `-strict_gop 1` for consistent 600-frame keyframe spacing
+- **Lean rate control**: `-rc-lookahead 32`, `-tune hq`; all AQ flags removed for stability and efficiency
+- **Robust init**: Applies `-weighted_pred 1` only when B-frames are disabled to avoid NVENC HEVC init errors
 
 ### Fallback Path: x265 (Software Encoding)
 - **Triggered automatically** if NVENC output is larger than the original file
 - **Better compression**: Uses slower presets (default: `slow`, CRF 18) for maximum quality per bit
 - **Same quality settings**: Preserves all HDR metadata identically to NVENC
 - **Re-reads original**: Restarts from the original library file to ensure clean source
+- **Decode-friendly**: Adds `-tune fastdecode`
+- **Predictable GOP**: Uses fixed `-g 600` while preserving scene-cut keyframes (no `keyint_min`)
 
 ### How the Fallback Works
 1. File completes NVENC encoding and remux
@@ -141,8 +146,74 @@ Both NVENC and x265 paths use the same default quality settings:
 - **Pixel format**: `p010le` (10-bit)
 - **HDR params**: BT.2020 color primaries, SMPTE 2084 transfer, mastering display, MaxCLL
 - **Adaptive bitrate**: 60% of source (with 1.5x maxrate buffer)
+- **GOP & tune**:
+   - NVENC: `-g 600 -keyint_min 600 -strict_gop 1 -tune hq -rc-lookahead 32` (AQ removed)
+   - x265: `-g 600 -tune fastdecode` (scene-cut keyframes still allowed)
 
 You can adjust these in the flow nodes if needed.
+
+---
+
+## Recent Improvements (Dec 2025)
+
+After additional testing across diverse Dolby Vision sources, the encoding settings have been refined for better efficiency and stability:
+
+- **NVENC (hevc_nvenc):**
+   - Added fixed GOP: `-g 600 -keyint_min 600` plus `-strict_gop 1` for consistent segmenting
+   - Removed AQ flags (`-spatial_aq`, `-temporal-aq`, `-aq-strength`) to improve efficiency and avoid edge cases
+   - Kept `-rc-lookahead 32` and `-tune hq` for strong rate control and quality
+   - Conditional `-weighted_pred 1` only when B-frames are disabled to prevent NVENC init errors
+   - **Increased min bitrate multiplier from 0.5 to 0.8** for tighter rate control and more consistent compression
+   - Bitrate calculation now uses extracted stream size (video-only) instead of container bitrate
+   - Retains adaptive bitrate caps and HDR metadata preservation
+
+- **x265 (libx265):**
+   - Added `-tune fastdecode` to improve decoder friendliness without compromising HDR
+   - Uses fixed `-g 600` (no `keyint_min`) to allow scene-cut keyframes for quality on cuts
+   - Enforces VBV when adaptive bitrate is active; preserves HDR mastering and MaxCLL
+   - Bitrate calculation prioritizes extracted stream size for accurate video-only targets
+
+Overall result: smaller or equal file sizes with steadier playback characteristics, improved hardware encoder reliability, and consistent GOP structure across both lanes.
+
+## Encoding Parameters & Defaults
+
+### NVENC (Hardware) Encoder
+- **CQ (Constant Quality)**: `21` (range 0-51, lower = better quality)
+- **Bitrate Reduction**: `0.7` (70% of source video bitrate)
+- **Min Rate Multiplier**: `0.8` (minimum bitrate = 80% of target)
+- **Max Rate Multiplier**: `1.5` (maximum bitrate = 150% of target)
+- **B-frames**: Enabled (better compression)
+- **Multipass**: Enabled (fullres, ~2× encode time, 10-15% size reduction)
+- **GOP Size**: Fixed 600 frames (~25s @ 24fps)
+- **Preset**: `p7` (highest quality)
+- **RC Mode**: VBR + CQ
+
+**Example Bitrate Calculation:**
+- Source: 10,000 kbps video
+- Target: 10,000 × 0.7 = 7,000 kbps
+- Min: 7,000 × 0.8 = 5,600 kbps
+- Max: 7,000 × 1.5 = 10,500 kbps
+- After remuxing audio (~600 kbps): ~7,600 kbps total (24% reduction)
+
+### x265 (Software) Encoder
+- **CRF (Constant Rate Factor)**: `18` (range 0-51, lower = better quality)
+- **Bitrate Reduction**: `0.6` (60% of source video bitrate)
+- **Preset**: `slow` (better compression than medium)
+- **Tune**: `fastdecode` (optimized for playback)
+- **GOP Size**: Fixed 600 frames with scene-cut detection
+- **VBV Enforcement**: When adaptive bitrate enabled, sets `vbv-maxrate` and `vbv-bufsize` to enforce caps
+
+**When x265 is Used:**
+- NVENC size check fails (output larger than original)
+- Hardware encoder not available
+- User explicitly routes to software encode
+
+### HDR Metadata Preservation (Both Encoders)
+- Color primaries: BT.2020
+- Transfer characteristics: SMPTE 2084 (PQ)
+- Color space: BT.2020nc
+- Mastering display metadata (G/B/R/WP/L values)
+- MaxCLL and MaxFALL light levels
 
 ---
 
