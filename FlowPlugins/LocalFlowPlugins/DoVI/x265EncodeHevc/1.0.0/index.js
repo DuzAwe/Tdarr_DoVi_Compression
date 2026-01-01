@@ -326,7 +326,7 @@ const plugin = (args) => {
     const crf = args.inputs.crf || '18';
     const preset = args.inputs.preset || 'slow';
 
-    const streamOutputArgs = ['-c:v', 'libx265', '-preset', preset, '-crf', crf, '-tune', 'fastdecode'];
+    const streamOutputArgs = ['-c:v', 'libx265', '-preset', preset, '-crf', crf];
     streamOutputArgs.push('-pix_fmt', 'p010le', '-profile:v', 'main10', '-bf', '5', '-g', '600');
     
     // Add bitrate constraints if adaptive bitrate is available
@@ -361,6 +361,11 @@ const plugin = (args) => {
     // Ensure input is set and add only global options which aren't stream-specific
     if (!Array.isArray(args.variables.ffmpegCommand.overallInputArguments)) {
         args.variables.ffmpegCommand.overallInputArguments = [];
+    }
+    // Add hardware-accelerated decoding if not already present
+    const hasHwaccel = args.variables.ffmpegCommand.overallInputArguments.some((v)=>String(v).toLowerCase()==='-hwaccel');
+    if (!hasHwaccel) {
+        args.variables.ffmpegCommand.overallInputArguments.push('-hwaccel', 'cuda');
     }
     // Add input if missing
     const hasInputFlag = args.variables.ffmpegCommand.overallInputArguments.some((v)=>String(v).toLowerCase()==='-i');

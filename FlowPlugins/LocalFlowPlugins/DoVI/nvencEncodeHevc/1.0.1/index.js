@@ -383,6 +383,11 @@ const plugin = (args) => {
     if (!Array.isArray(args.variables.ffmpegCommand.overallInputArguments)) {
         args.variables.ffmpegCommand.overallInputArguments = [];
     }
+    // Add hardware-accelerated decoding if not already present
+    const hasHwaccel = args.variables.ffmpegCommand.overallInputArguments.some((v)=>String(v).toLowerCase()==='-hwaccel');
+    if (!hasHwaccel) {
+        args.variables.ffmpegCommand.overallInputArguments.push('-hwaccel', 'cuda');
+    }
     // Add input if missing
     const hasInputFlag = args.variables.ffmpegCommand.overallInputArguments.some((v)=>String(v).toLowerCase()==='-i');
     if (!hasInputFlag) {

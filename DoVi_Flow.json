@@ -1147,6 +1147,21 @@
       }
     },
     {
+      "name": "Check BPP Efficiency",
+      "sourceRepo": "Local",
+      "pluginName": "checkBPPEfficiency",
+      "version": "1.0.0",
+      "inputsDB": {
+        "bpp_threshold": "0.15"
+      },
+      "fpEnabled": true,
+      "id": "checkBPP",
+      "position": {
+        "x": 1297.0484097964224,
+        "y": -1770.857420000547
+      }
+    },
+    {
       "name": "Requeue for DoVi Node",
       "sourceRepo": "Community",
       "pluginName": "tagsRequeue",
@@ -1563,6 +1578,13 @@
       "id": "5pmz44iwM"
     },
     {
+      "source": "checkBPP",
+      "sourceHandle": "1",
+      "target": "FAbA1f_6f",
+      "targetHandle": null,
+      "id": "checkBPPToHDRCheck"
+    },
+    {
       "source": "uTF9uuy1a",
       "sourceHandle": "1",
       "target": "T3z1S0FcQ",
@@ -1943,7 +1965,7 @@
     {
       "source": "u4ElRztTh",
       "sourceHandle": "1",
-      "target": "FAbA1f_6f",
+      "target": "checkBPP",
       "targetHandle": null,
       "id": "CxQkiCSb3"
     },

@@ -168,7 +168,6 @@ After additional testing across diverse Dolby Vision sources, the encoding setti
    - Retains adaptive bitrate caps and HDR metadata preservation
 
 - **x265 (libx265):**
-   - Added `-tune fastdecode` to improve decoder friendliness without compromising HDR
    - Uses fixed `-g 600` (no `keyint_min`) to allow scene-cut keyframes for quality on cuts
    - Enforces VBV when adaptive bitrate is active; preserves HDR mastering and MaxCLL
    - Bitrate calculation prioritizes extracted stream size for accurate video-only targets
@@ -199,7 +198,6 @@ Overall result: smaller or equal file sizes with steadier playback characteristi
 - **CRF (Constant Rate Factor)**: `18` (range 0-51, lower = better quality)
 - **Bitrate Reduction**: `0.6` (60% of source video bitrate)
 - **Preset**: `slow` (better compression than medium)
-- **Tune**: `fastdecode` (optimized for playback)
 - **GOP Size**: Fixed 600 frames with scene-cut detection
 - **VBV Enforcement**: When adaptive bitrate enabled, sets `vbv-maxrate` and `vbv-bufsize` to enforce caps
 

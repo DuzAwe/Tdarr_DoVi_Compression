@@ -91,6 +91,21 @@ const plugin = (args) => {
   const delta = currentSize - originalSize;
 
   if (delta > allowedIncrease) {
+    // Check if we're already on the x265 fallback path
+    const useX265 = args.variables?.use_x265;
+    
+    if (useX265) {
+      // Already tried x265, keep original file instead of failing again
+      args.jobLog(`x265 encode also larger than original (original=${originalSize} bytes, output=${currentSize} bytes, delta=${delta} bytes). Keeping original file.`);
+      args.logOutcome('tSuc');
+      return {
+        outputFileObj: args.originalLibraryFile,
+        outputNumber: 1,
+        variables: args.variables,
+      };
+    }
+    
+    // First attempt (NVENC), trigger x265 fallback
     args.jobLog(`Failing: output larger than original. original=${originalSize} bytes, output=${currentSize} bytes, delta=${delta} bytes, allowedIncrease=${allowedIncrease} bytes`);
     throw new Error('Output file size is larger than original');
   }
