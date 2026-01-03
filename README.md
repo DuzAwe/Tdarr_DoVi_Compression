@@ -1,18 +1,19 @@
 # Tdarr_DoVi_Processing
 
-A set of Tdarr plugins that can handle Dolby Vision videos in **Profiles 4, 5, 7, 8**, and **HDR10+**, remuxing and re-encoding with NVENC into MKV files aiming for a 60% reduction in size. This project originated from andrasmaroy’s [Tdarr_Plugins_DoVi](https://github.com/andrasmaroy/Tdarr_Plugins_DoVi) & nichols89ben [Tdarr_Plugins_DoVi](https://github.com/nichols89ben/Tdarr_DoVi_Processing). I spent a number of weeks adding the NVENC process testing accross all DV Profiles.
+A set of Tdarr plugins and a flow that can handle Dolby Vision videos in **Profiles 4, 5, 7, 8**, and **HDR10+**, remuxing and re-encoding with NVENC into MKV files aiming for a 30% - 50% reduction in size. This project originated from andrasmaroy's [Tdarr_Plugins_DoVi](https://github.com/andrasmaroy/Tdarr_Plugins_DoVi) & nichols89ben [Tdarr_Plugins_DoVi](https://github.com/nichols89ben/Tdarr_DoVi_Processing). I spent a number of weeks adding the NVENC process, BPP cut off and testing across all DV Profiles.
 
 ---
 
 ## Overview
 
-Many Users could save GBs with no noticable drop in quality. 
+Many users could save GBs with no noticeable drop in quality. As such I have also aimed to balance time & electricity cost into the flow. Adding the BPP filter to skip files that are well compressed already, not just to reduce the likelihood of lost visual quality but also to prevent looping forever trying to hit a file size that isn't possible.  
 
-- **Goal**: Preserve Dolby Vision whenever possible while ensuring the file remains playable on LG TVs and other devices.  
-- **Main Approach**:  
+- **Goal**: Preserve Dolby Vision and reduce file size where possible.   
+- **Main Approach**:
+  - Filter already well-optimized files (anything under BPP of 0.15)
   - Filter or identify DV files (Profiles 4, 5, 7, 8) and HDR10+ content.  
   - If DV Profile 7 lacks HDR10 fallback metadata, optionally convert it from dual-layer to single-layer (Profile 8.1).  
-  - Repack or transcode as needed, then remux into MP4 with correct DoVi flags.
+  - Repack or transcode as needed, then remux into MKV with correct DoVi flags. (built with the Nvidia Sheild in mind)
 
 This README explains how the **Extract → Inject → Package** (or skip steps if not needed) pipeline works, which ensures safer playback on LG TVs and the Nvidia Shield.
 
@@ -20,14 +21,15 @@ This README explains how the **Extract → Inject → Package** (or skip steps i
 
 ## Key Features
 
-1. **Handles DV Profiles 4/5/7/8 & HDR10+.**  
-2. **Preserves original Dolby Vision profiles** — no forced P7→P8 conversion unless explicitly selected (HDR10+ lane only).  
-3. **Optional fallback detection** (checks if ST 2086 / MaxCLL / Master Display info is present).  
-4. **Profile 7** can remain dual-layer or be converted to single-layer if fallback is missing.  
-5. **HDR10+** → DV Profile 8 conversion using `hdr10plus_tool` (isolated to HDR10+ lane).  
-6. **All subtitle types preserved** in final remux (SubRip, PGS, etc.) — no sidecar files created.  
-7. **NVENC re-encoding** with adaptive bitrate and HDR metadata preservation (color primaries, transfer characteristics, mastering display, MaxCLL).  
-8. **Remux preserves original non-video streams** — only the video stream is replaced; audio, subtitles, chapters, and metadata remain unchanged.
+1. **BPP-based efficiency filter** — skips re-encoding files already well-compressed (BPP < 0.15) to save processing time and prevent quality loss.
+2. **Handles DV Profiles 4/5/7/8 & HDR10+.**  
+3. **Preserves original Dolby Vision profiles** — no forced P7→P8 conversion unless explicitly selected (HDR10+ lane only).  
+4. **Optional fallback detection** (checks if ST 2086 / MaxCLL / Master Display info is present).  
+5. **Profile 7** can remain dual-layer or be converted to single-layer if fallback is missing.  
+6. **HDR10+** → DV Profile 8 conversion using `hdr10plus_tool` (isolated to HDR10+ lane).  
+7. **All subtitle types preserved** in final remux (SubRip, PGS, etc.) — no sidecar files created.  
+8. **NVENC re-encoding** with adaptive bitrate and HDR metadata preservation (color primaries, transfer characteristics, mastering display, MaxCLL).  
+9. **Remux preserves original non-video streams** — only the video stream is replaced; audio, subtitles, chapters, and metadata remain unchanged.
 
 ---
 
@@ -35,21 +37,25 @@ This README explains how the **Extract → Inject → Package** (or skip steps i
 
 1. **Check HDR type**  
    - Identifies if file is DV, HDR10+, HDR10, or SDR via MediaInfo.  
-2. **Check DoVi Profile**  
+2. **Check BPP Efficiency**  
+   - Calculates bits-per-pixel (BPP) from video bitrate, resolution, and framerate.
+   - Skips encoding if BPP < 0.15 (already well-compressed).
+   - Prevents unnecessary processing and potential quality loss on efficient files.
+3. **Check DoVi Profile**  
    - Determines Profile 4, 5, 7 (single/dual-layer), or 8.  
-3. **Check for HDR10 fallback**  
+4. **Check for HDR10 fallback**  
    - Looks for Mastering Display / ST 2086 / CLL. If missing, flags it.  
-4. **Extract / Reorder streams**  
+5. **Extract / Reorder streams**  
    - Reorders streams and extracts raw HEVC video only. Subtitles remain untouched for final remux.  
-5. **NVENC Encode**  
+6. **NVENC Encode**  
    - Re-encodes HEVC with adaptive bitrate, preserving HDR metadata (color primaries, transfer characteristics, mastering display, MaxCLL).  
-6. **Extract & Inject RPU**  
+7. **Extract & Inject RPU**
    - **Profile 4/5/8**: Extract RPU with `dovi_tool extract-rpu`, inject back with `inject-rpu`. **Original profile preserved.**  
    - **Profile 7**: Extract with `extractDoVi7Rpu` (no `-m 2`), inject with `injectDoVi7Rpu`. **Profile 7 remains Profile 7.**  
    - **HDR10+**: Extract HDR10+ metadata to JSON, convert to DV Profile 8 via `injectHdr10toDoVi8`.  
-7. **Wrap with mkvmerge**  
+8. **Wrap with mkvmerge**  
    - Wraps injected HEVC in video-only MKV with timestamps to protect DV NALs.  
-8. **Remux with ffmpeg**  
+9. **Remux with ffmpeg**
    - Maps video from wrapped MKV and audio/subtitles/chapters/metadata from original file. Final output is MKV.
 
 ---
@@ -63,23 +69,31 @@ Below is a quick summary of each plugin used in the flow. Many are adapted from 
    - **Enhanced** to detect DV via `HDR_Format_Profile` (e.g., `dvhe.08.06`) and prefer DV when both DV and HDR10+ are present (common in P8.1 files).
    - Adjusted to handle SMPTE ST 2094 (HDR10+) properly.
 
-2. **Check DoVi Profile**  
+2. **Check BPP Efficiency**  
+   - Calculates bits-per-pixel (BPP) from video bitrate, resolution, and framerate.
+   - Default threshold: **0.15 BPP** (optimized for 4K HDR content).
+   - Skips encoding if BPP is below threshold (file already well-compressed).
+   - Uses video-only bitrate (prioritizes extracted stream `format.size` calculation).
+   - Prevents wasted processing time and potential quality degradation on already-efficient encodes.
+   - Placed after Requeue (on DoVi node) but before any extraction/encoding work.
+
+3. **Check DoVi Profile**
    - Inspects Dolby Vision to see if it’s Profile 4, 5, 7, or 8.  
    - Unmodified from the original version.
 
-3. **Check HDR10 Fallback Metadata**  
-   - Detects missing fallback (e.g., `cll=0,0` or no mention of ST 2086 / Master Display).  
+4. **Check HDR10 Fallback Metadata**  
+   - Detects missing fallback (e.g., `cll=0,0` or no mention of ST 2086 / Master Display).  
    - Flags if fallback is absent.
 
-4. **ffmpeg - Reorder Streams DoVi**  
+5. **ffmpeg - Reorder Streams DoVi**  
    - Reorders audio/subtitle/video streams so the video stream is last.  
    - Helps certain DoVi injection steps that rely on a fixed stream order.
 
-5. **ffmpeg - Extract Streams DoVi**  
+6. **ffmpeg - Extract Streams DoVi**  
    - Extracts raw HEVC video only. Subtitles are **not** extracted as sidecar files.  
    - All original subtitle streams (SubRip, PGS, etc.) are preserved in the final remux via `-map 1:s?`.
 
-6. **Extract DoVi RPU / Inject DoVi RPU / Wrap & Remux MKV**  
+7. **Extract DoVi RPU / Inject DoVi RPU / Wrap & Remux MKV**
    - For **Profiles 4/5/8**: Extract RPU with `dovi_tool extract-rpu`, inject back with `dovi_tool inject-rpu`. No forced `-m 2` usage. **Original profile is preserved.**
    - For **Profile 7**: 
      - **Extract DoVi 7 RPU** (dual-layer) without `-m 2` to preserve HDR10 fallback.  
@@ -88,17 +102,17 @@ Below is a quick summary of each plugin used in the flow. Many are adapted from 
      - **Remux with ffmpeg** mapping video from wrapped MKV + audio/subs/chapters/metadata from original file.
    - **Profile 7 remains Profile 7; no implicit P7→P8 conversion.**
 
-7. **Processing HDR10+**  
+8. **Processing HDR10+**  
    - **Extract HDR10+ Metadata** → .json using `hdr10plus_tool`.  
    - **Inject HDR10+ as DoVi P8** → Convert it to DV Profile 8.  
    - **Wrap & Remux** the new DV (Profile 8) track in MKV.
 
-8. **Remux DoVi MKV**  
-   - Maps video from the wrapped MKV (output of step 6) and audio/subtitles/chapters/metadata from the original file.  
+9. **Remux DoVi MKV**  
+   - Maps video from the wrapped MKV (output of step 7) and audio/subtitles/chapters/metadata from the original file.  
    - Uses `-c copy` for all streams to avoid re-encoding. All audio codecs (including TrueHD/DTS-HD) are preserved.  
    - Final container is MKV; original file is replaced with the new MKV.
 
-9. **Size Check & Software Fallback**  
+10. **Size Check & Software Fallback**  
    - After the final remux, the flow checks if the output file is larger than the original.
    - If the output is larger, the flow automatically restarts with **x265 software encoding** instead of NVENC.
    - This ensures you always get the smallest possible file without sacrificing quality.
@@ -218,7 +232,7 @@ Overall result: smaller or equal file sizes with steadier playback characteristi
 ## Common Flows
 
 **Short version**:  
-[Input File] → [Extract raw HEVC stream] → [Extract Dolby Vision RPU] → [NVENC re-encode HEVC with HDR fallback preserved] → [Inject DV RPU] → [Wrap with mkvmerge (video-only MKV)] → [Remux with ffmpeg (video from wrapped MKV + audio/subs/chapters from original)] → **[Size Check]** → [Replace Original] or [Restart with x265]
+[Input File] → [Requeue to DoVi Node] → **[Check BPP Efficiency]** → [Extract raw HEVC stream] → [Extract Dolby Vision RPU] → [NVENC re-encode HEVC with HDR fallback preserved] → [Inject DV RPU] → [Wrap with mkvmerge (video-only MKV)] → [Remux with ffmpeg (video from wrapped MKV + audio/subs/chapters from original)] → **[Size Check]** → [Replace Original] or [Restart with x265]
 
 **Key points:**
 - **Profile preservation**: Profile 7 inputs produce Profile 7 outputs; Profile 8 inputs produce Profile 8 outputs. No implicit conversion.
