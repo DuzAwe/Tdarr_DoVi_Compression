@@ -40,7 +40,7 @@
         "y": 60
       },
       "inputsDB": {
-        "cq": "18",
+        "cq": "21",
         "enable_bframes": "true"
       }
     },
@@ -83,7 +83,7 @@
         "y": 60
       },
       "inputsDB": {
-        "cq": "18",
+        "cq": "21",
         "enable_bframes": "true"
       }
     },
@@ -126,7 +126,7 @@
         "y": 60
       },
       "inputsDB": {
-        "cq": "18",
+        "cq": "21",
         "enable_bframes": "true"
       }
     },
@@ -169,7 +169,7 @@
         "y": 60
       },
       "inputsDB": {
-        "cq": "18",
+        "cq": "21",
         "enable_bframes": "true"
       }
     },
@@ -781,6 +781,9 @@
       "sourceRepo": "Local",
       "pluginName": "x265EncodeHevc",
       "version": "1.0.0",
+      "inputsDB": {
+        "crf": "18"
+      },
       "fpEnabled": true,
       "id": "x265EncP8",
       "position": {
@@ -836,6 +839,9 @@
       "sourceRepo": "Local",
       "pluginName": "x265EncodeHevc",
       "version": "1.0.0",
+      "inputsDB": {
+        "crf": "18"
+      },
       "fpEnabled": true,
       "id": "x265EncP7",
       "position": {
@@ -891,6 +897,9 @@
       "sourceRepo": "Local",
       "pluginName": "x265EncodeHevc",
       "version": "1.0.0",
+      "inputsDB": {
+        "crf": "18"
+      },
       "fpEnabled": true,
       "id": "x265EncP7S",
       "position": {

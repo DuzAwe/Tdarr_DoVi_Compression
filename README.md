@@ -152,14 +152,16 @@ The flow uses a **two-tier encoding approach** to balance speed and file size:
 6. Final output is guaranteed to be smaller (or same quality if already optimal)
 
 ### Configuration
-Both NVENC and x265 paths use the same default quality settings:
-- **CRF**: 18 (lower = better quality, range 0-51)
+Both NVENC and x265 paths use optimized quality settings:
+- **Quality Settings**:
+  - NVENC: CQ 21 (constant quality, 0-51 range)
+  - x265: CRF 18 (constant rate factor, 0-51 range)
 - **Preset**: 
   - NVENC: `p7` (highest quality hardware preset)
   - x265: `slow` (balanced speed/compression)
 - **Pixel format**: `p010le` (10-bit)
 - **HDR params**: BT.2020 color primaries, SMPTE 2084 transfer, mastering display, MaxCLL
-- **Adaptive bitrate**: 60% of source (with 1.5x maxrate buffer)
+- **Adaptive bitrate**: 60-70% of source (with min/max rate buffers)
 - **GOP & tune**:
    - NVENC: `-g 600 -keyint_min 600 -strict_gop 1 -tune hq -rc-lookahead 32` (AQ removed)
    - x265: `-g 600 -tune fastdecode` (scene-cut keyframes still allowed)
