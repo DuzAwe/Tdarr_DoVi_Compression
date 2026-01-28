@@ -338,7 +338,7 @@ const plugin = (args) => {
     // Build encoding arguments
     const cq = args.inputs.cq || '21';
 
-    const streamOutputArgs = ['-c:v', 'hevc_nvenc', '-preset', 'p7', '-rc:v', 'vbr_hq', '-cq:v', cq];
+    const streamOutputArgs = ['-c:v', 'hevc_nvenc', '-preset', 'p7', '-rc', 'vbr', '-cq', cq];
     if (args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true') {
         streamOutputArgs.push('-bf', '5', '-b_ref_mode', 'each');
     }
