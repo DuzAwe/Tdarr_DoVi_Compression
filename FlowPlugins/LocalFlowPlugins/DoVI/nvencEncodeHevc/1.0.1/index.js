@@ -338,7 +338,7 @@ const plugin = (args) => {
     // Build encoding arguments
     const cq = args.inputs.cq || '21';
 
-    const streamOutputArgs = ['-c:v', 'hevc_nvenc', '-preset', 'p7', '-rc:v', 'vbr', '-cq:v', cq];
+    const streamOutputArgs = ['-c:v', 'hevc_nvenc', '-preset', 'p7', '-rc:v', 'vbr_hq', '-cq:v', cq];
     if (args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true') {
         streamOutputArgs.push('-bf', '5', '-b_ref_mode', 'each');
     }
@@ -400,7 +400,7 @@ const plugin = (args) => {
     if (adaptiveBitrate) {
         args.jobLog(`NVENC encoding (adaptive): cq=${cq} current=${currentBitrate}k target=${targetBitrate}k min=${minimumBitrate}k max=${maximumBitrate}k bufsize=${Math.round(maximumBitrate * 2)}k`);
     } else {
-        args.jobLog(`NVENC encoding (CQ-only): cq=${cq} rc=vbr`);
+        args.jobLog(`NVENC encoding (CQ-only): cq=${cq} rc=vbr_hq`);
     }
     if (hdrMetadata) {
         args.jobLog(`HDR metadata preserved: ${hdrMetadata.trim()}`);
