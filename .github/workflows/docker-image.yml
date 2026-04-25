@@ -58,7 +58,7 @@ jobs:
       
       - name: Build and Push Docker image to GHCR
         if: steps.check.outputs.changed == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: 'Docker/dovi-tdarr-node:latest/Dockerfile'
