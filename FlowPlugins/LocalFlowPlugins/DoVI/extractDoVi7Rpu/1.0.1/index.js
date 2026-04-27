@@ -36,13 +36,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.plugin = exports.details = void 0;
 
+// Keep these imports
 var cliUtils_1 = require("../../../../FlowHelpers/1.0.0/cliUtils");
 var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 
+// Plugin metadata
 var details = function () {
   return {
-    name: 'Package DoVi 7 mkv',
-    description: 'Package HEVC stream with injected DoVi RPU in mkv (Profile 8)',
+    name: 'Extract DoVi 7 RPU',
+    description: 'Extract Dolby Vision RPU data for Profile 7',
     style: { borderColor: 'orange' },
     tags: 'video',
     isStartPlugin: false,
@@ -63,44 +65,89 @@ exports.details = details;
 
 var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, outFileName, outFilePath, spawnArgs, cli, res;
+    var lib, pluginWorkDir, outputFileName, outputFilePath, videoStreamCount, ffprobeCmd, probeRes, fs, outputStat, spawnArgs, ffmpegCmd, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           lib = require('../../../../../methods/lib')();
           args.inputs = lib.loadDefaultValues(args.inputs, details);
-          pluginWorkDir = (0, fileUtils_1.getPluginWorkDir)(args);
 
-          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_dolby.mkv";
-          outFilePath = pluginWorkDir + "/" + outFileName;
+          // Prepare working directory for RPU output
+          pluginWorkDir = args.workDir + "/dovi_tool";
+          args.deps.fsextra.ensureDirSync(pluginWorkDir);
 
-          spawnArgs = [
-            '-o',
-            outFilePath,
-            args.inputFileObj.file
-          ];
+          // Name and path for the extracted RPU binary
+          outputFileName = (0, fileUtils_1.getFileName)(args.inputFileObj.file) + ".rpu.bin";
+          outputFilePath = pluginWorkDir + "/" + outputFileName;
 
+          // Count how many video streams are present
+          videoStreamCount = 1;
+          ffprobeCmd = new cliUtils_1.CLI({
+            cli: 'ffprobe',
+            spawnArgs: [
+              '-v', 'error',
+              '-select_streams', 'v',
+              '-show_entries', 'stream=index',
+              '-of', 'csv=p=0',
+              args.inputFileObj.file
+            ],
+            spawnOpts: {},
+            jobLog: args.jobLog,
+            inputFileObj: args.inputFileObj,
+            updateWorker: args.updateWorker
+          });
+          return [4 /*yield*/, ffprobeCmd.runCli()];
+        case 1:
+          probeRes = _a.sent();
+          if (probeRes.cliExitCode === 0 && probeRes.cliOutput) {
+            videoStreamCount = probeRes.cliOutput
+              .split('\n')
+              .filter(function (line) { return line.trim() !== ''; }).length;
+          }
+          if (!videoStreamCount || videoStreamCount < 1) {
+            videoStreamCount = 1; // fallback
+          }
+
+          if (videoStreamCount > 1) {
+            args.jobLog('Detected multiple video streams. Extracting RPU from first video stream (0:v:0).');
+          }
+
+          // We do NOT use "-m 2" here; we simply extract the RPU as-is to preserve all HDR fallback
+          ffmpegCmd =
+            "ffmpeg -y -loglevel error -stats " +
+            "-i \"" + args.inputFileObj.file + "\" " +
+            "-map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | " +
+            "/usr/local/bin/dovi_tool extract-rpu - -o \"" + outputFilePath + "\"";
+
+          spawnArgs = ['-c', ffmpegCmd];
           cli = new cliUtils_1.CLI({
-            cli: '/usr/bin/mkvmerge',
+            cli: '/bin/bash',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,
-            outputFilePath: outFilePath,
+            outputFilePath: outputFilePath,
             inputFileObj: args.inputFileObj,
             logFullCliOutput: args.logFullCliOutput,
             updateWorker: args.updateWorker,
           });
-
           return [4 /*yield*/, cli.runCli()];
-        case 1:
+        case 2:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
-            args.jobLog('Packaging stream into mkv failed');
-            throw new Error('mkvmerge failed');
+            args.jobLog('Extracting DoVi 7 RPU failed');
+            throw new Error('dovi_tool failed');
+          }
+          fs = args.deps.fs || require('fs');
+          if (!fs.existsSync(outputFilePath)) {
+            throw new Error('dovi_tool did not create RPU output file');
+          }
+          outputStat = fs.statSync(outputFilePath);
+          if (!outputStat.size || outputStat.size <= 0) {
+            throw new Error('Extracted RPU file is empty');
           }
           args.logOutcome('tSuc');
           return [2 /*return*/, {
-            outputFileObj: { _id: outFilePath },
+            outputFileObj: args.inputFileObj,
             outputNumber: 1,
             variables: args.variables,
           }];

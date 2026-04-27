@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.plugin = exports.details = void 0;
 
 const details = () => ({
-    name: 'x265 - Encode HEVC with HDR',
-    description: 'Re-encode raw HEVC stream using x265 (software) with adaptive bitrate, preserving all HDR metadata (10-bit).',
+    name: 'NVENC - Encode HEVC with HDR',
+    description: 'Re-encode raw HEVC stream using NVENC with adaptive bitrate, preserving all HDR metadata (10-bit).',
     style: {
-        borderColor: '#FFA500',
+        borderColor: '#00D000',
     },
     tags: 'video',
     isStartPlugin: false,
@@ -16,25 +16,25 @@ const details = () => ({
     icon: '',
     inputs: [
         {
-            label: 'CRF Value',
-            name: 'crf',
+            label: 'CQ Value',
+            name: 'cq',
             type: 'string',
-            defaultValue: '18',
+            defaultValue: '21',
             inputUI: {
                 type: 'text',
             },
-            tooltip: 'x265 constant rate factor (lower = better quality, 0-51). Default: 18',
+            tooltip: 'NVENC constant quality value (lower = better quality, 0-51). Default: 21',
         },
         {
-            label: 'Preset',
-            name: 'preset',
-            type: 'string',
-            defaultValue: 'slow',
+            label: 'Enable B-frames',
+            name: 'enable_bframes',
+            type: 'boolean',
+            defaultValue: true,
             inputUI: {
                 type: 'dropdown',
-                options: ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow', 'placebo'],
+                options: ['false', 'true'],
             },
-            tooltip: 'x265 encoding preset. Slower = better compression. Default: slow',
+            tooltip: 'Use NVENC B-frames for better compression (recommended)',
         },
         {
             label: 'Bitrate Reduction',
@@ -80,22 +80,12 @@ const details = () => ({
             label: 'Enable Multipass',
             name: 'enable_multipass',
             type: 'boolean',
-            defaultValue: false,
+            defaultValue: true,
             inputUI: {
                 type: 'dropdown',
                 options: ['false', 'true'],
             },
-            tooltip: 'Use two-pass encoding for better rate control. ~2× encode time, 10-15% size reduction. Slower than NVENC multipass.',
-        },
-        {
-            label: 'x265 Extra Params',
-            name: 'x265_params',
-            type: 'string',
-            defaultValue: '',
-            inputUI: {
-                type: 'text',
-            },
-            tooltip: 'Additional x265-params (colon-separated). Example: aq-mode=3:psy-rd=2.0. Leave empty for auto-detection.',
+            tooltip: 'Use two-pass encoding for better rate control (fullres). ~2× encode time, 10-15% size reduction. Recommended.',
         },
     ],
     outputs: [
@@ -234,8 +224,9 @@ const plugin = (args) => {
         args.jobLog(`  - inputFileObj.file_size(MB): ${args.inputFileObj.file_size || 'undefined'}`);
         args.jobLog(`  - durationSeconds: ${durationSeconds}`);
 
-        // 1) Prioritize extracted stream size (video-only bitrate)
-        if (Number(args.inputFileObj.ffProbeData?.format?.size) > 0 && durationSeconds > 0) {
+        // 1) Container size — only valid as video-only proxy when there are no non-video streams
+        const nonVideoCount = streams.filter(s => s.codec_type !== 'video').length;
+        if (Number(args.inputFileObj.ffProbeData?.format?.size) > 0 && durationSeconds > 0 && nonVideoCount === 0) {
             const bytes = Number(args.inputFileObj.ffProbeData.format.size);
             bitRateBps = Math.round((bytes * 8) / durationSeconds);
             args.jobLog(`Bitrate source: format.size bytes=${bytes} duration=${durationSeconds}s => ${bitRateBps}bps`);
@@ -279,13 +270,13 @@ const plugin = (args) => {
             }
         }
     } catch (e) {
-        args.jobLog(`[ERROR] Bitrate detection failed: ${e.message}`);
+        args.jobLog(`[ERROR] NVENC bitrate detection failed: ${e.message}`);
     }
 
     const currentBitrate = bitRateBps ? Math.round(bitRateBps / 1000) : 0;
     const adaptiveBitrate = currentBitrate > 0;
     if (!adaptiveBitrate) {
-        args.jobLog('Bitrate unavailable; using CRF-only x265');
+        args.jobLog('Bitrate unavailable; using CQ-only NVENC (vbr + cq)');
     }
 
     // Check bitrate cutoff
@@ -317,8 +308,7 @@ const plugin = (args) => {
     }
 
     // Extract HDR metadata and color properties
-    let masterDisplay = '';
-    let maxCll = '';
+    let hdrMetadata = '';
     const sideData = videoStream.side_data_list || [];
     for (const sd of sideData) {
         if (sd.side_data_type === 'Mastering display metadata') {
@@ -329,11 +319,11 @@ const plugin = (args) => {
                 ? `L(${sd.max_luminance},${sd.min_luminance})` 
                 : '';
             if (colorInfo || luminance) {
-                masterDisplay = `${colorInfo}${luminance}`;
+                hdrMetadata += `-master-display "${colorInfo}${luminance}" `;
             }
         }
         if (sd.side_data_type === 'Content light level metadata' && sd.max_content) {
-            maxCll = `${sd.max_content},${sd.max_average}`;
+            hdrMetadata += `-max-cll "${sd.max_content},${sd.max_average}" `;
         }
     }
 
@@ -346,55 +336,28 @@ const plugin = (args) => {
     const ffTrc = (trc.includes('2084') || trc.includes('pq') || trc.includes('smpte2084')) ? 'smpte2084' : (trc || 'smpte2084');
     const ffSpace = (space.includes('2020') && (space.includes('nc') || space.includes('ncl'))) ? 'bt2020nc' : (space || 'bt2020nc');
 
-    // Map transfer characteristics to x265 names
-    const x265Transfer = (trc.includes('2084') || trc.includes('pq') || trc.includes('smpte2084')) ? 'smpte2084' : 
-                         (trc.includes('arib') || trc.includes('std-b67') || trc.includes('hlg')) ? 'arib-std-b67' : 'smpte2084';
-
-    // Build x265-params for HDR metadata and quality
-    const x265ParamParts = [];
-    // Core 10-bit HDR profile
-    x265ParamParts.push('profile=main10');
-    x265ParamParts.push('hdr10=1');
-    x265ParamParts.push('hdr10-opt=1');
-    x265ParamParts.push('colorprim=bt2020');
-    x265ParamParts.push(`transfer=${x265Transfer}`);
-    x265ParamParts.push('colormatrix=bt2020nc');
-    
-    // HDR metadata
-    if (masterDisplay) {
-        x265ParamParts.push(`master-display="${masterDisplay}"`);
-    }
-    if (maxCll) {
-        x265ParamParts.push(`max-cll="${maxCll}"`);
-    }
-    
-    // Quality enhancements for better compression
-    x265ParamParts.push('aq-mode=3');
-    x265ParamParts.push('aq-strength=1.0');
-    x265ParamParts.push('rd=4');
-    x265ParamParts.push('psy-rd=2.0');
-    x265ParamParts.push('psy-rdoq=1.0');
-    x265ParamParts.push('no-sao=0');
-    x265ParamParts.push('selective-sao=2');
-    
-    // Add user-supplied extra params (will override defaults if specified)
-    if (args.inputs.x265_params && args.inputs.x265_params.trim().length > 0) {
-        x265ParamParts.push(args.inputs.x265_params.trim());
-    }
-
     // Build encoding arguments
-    const crf = args.inputs.crf || '18';
-    const preset = args.inputs.preset || 'slow';
+    const cq = args.inputs.cq || '21';
 
-    const streamOutputArgs = ['-c:v', 'libx265', '-preset', preset, '-crf', crf];
+    const streamOutputArgs = ['-c:v', 'hevc_nvenc', '-preset', 'p7', '-rc', 'vbr', '-cq', cq];
+    if (args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true') {
+        streamOutputArgs.push('-bf', '5', '-b_ref_mode', 'each');
+    }
     
-    // Add multipass if enabled (x265 uses -x265-params pass=1/2)
-    // For now we'll just note it in x265-params for manual two-pass workflow
-    // Single-pass with CRF+VBV is typically used
+    streamOutputArgs.push('-g', '600', '-keyint_min', '600', '-rc-lookahead', '32', '-tune', 'hq', '-strict_gop', '1');
     
-    streamOutputArgs.push('-pix_fmt', 'p010le', '-profile:v', 'main10', '-bf', '5', '-g', '600', '-keyint_min', '600');
+    // Add multipass if enabled
+    if (args.inputs.enable_multipass === true || args.inputs.enable_multipass === 'true') {
+        streamOutputArgs.push('-multipass', 'fullres');
+    }
+
+    // Weighted prediction is not supported with B-frames on NVENC HEVC
+    // Only enable when B-frames are disabled
+    if (!(args.inputs.enable_bframes === true || args.inputs.enable_bframes === 'true')) {
+        streamOutputArgs.push('-weighted_pred', '1');
+    }
     
-    // Add bitrate constraints if adaptive bitrate is available
+    streamOutputArgs.push('-pix_fmt', 'p010le', '-profile:v', 'main10');
     if (adaptiveBitrate) {
         streamOutputArgs.push(
             '-b:v', `${targetBitrate}k`,
@@ -403,25 +366,10 @@ const plugin = (args) => {
             '-bufsize', `${Math.round(maximumBitrate * 2)}k`
         );
     }
-    
     streamOutputArgs.push('-color_primaries', ffPrimaries, '-color_trc', ffTrc, '-colorspace', ffSpace);
-    
-    // Add VBV params when adaptive bitrate is available to enforce rate control
-    if (adaptiveBitrate) {
-        x265ParamParts.push(`vbv-maxrate=${maximumBitrate}`);
-        x265ParamParts.push(`vbv-bufsize=${Math.round(maximumBitrate * 2)}`);
-    }
-    
-    // Add multipass to x265-params if enabled
-    if (args.inputs.enable_multipass === true || args.inputs.enable_multipass === 'true') {
-        // Note: For proper 2-pass, ffmpeg needs separate pass=1 and pass=2 runs
-        // This sets slow-firstpass=0 for better first pass analysis
-        x265ParamParts.push('slow-firstpass=0');
-    }
-    
-    // Apply x265-params (should always have content now)
-    if (x265ParamParts.length > 0) {
-        streamOutputArgs.push('-x265-params', x265ParamParts.join(':'));
+    if (hdrMetadata) {
+        const hdrParts = hdrMetadata.trim().split(' ').filter(x => x);
+        streamOutputArgs.push(...hdrParts);
     }
 
     // Force a single mapped video stream to satisfy Execute
@@ -451,12 +399,12 @@ const plugin = (args) => {
     const globalOutputArgs = ['-fps_mode', 'passthrough', '-map', '0:v', '-an', '-f', 'hevc'];
 
     if (adaptiveBitrate) {
-        args.jobLog(`x265 encoding (adaptive): preset=${preset} crf=${crf} current=${currentBitrate}k target=${targetBitrate}k min=${minimumBitrate}k max=${maximumBitrate}k bufsize=${Math.round(maximumBitrate * 2)}k`);
+        args.jobLog(`NVENC encoding (adaptive): cq=${cq} current=${currentBitrate}k target=${targetBitrate}k min=${minimumBitrate}k max=${maximumBitrate}k bufsize=${Math.round(maximumBitrate * 2)}k`);
     } else {
-        args.jobLog(`x265 encoding (CRF-only): preset=${preset} crf=${crf}`);
+        args.jobLog(`NVENC encoding (CQ-only): cq=${cq} rc=vbr_hq`);
     }
-    if (masterDisplay || maxCll) {
-        args.jobLog(`HDR metadata preserved: master-display=${masterDisplay} max-cll=${maxCll}`);
+    if (hdrMetadata) {
+        args.jobLog(`HDR metadata preserved: ${hdrMetadata.trim()}`);
     }
 
     // Push global arguments; Execute will add mapping per stream
@@ -465,7 +413,7 @@ const plugin = (args) => {
     // Debug: confirm streams are present for Execute
     try {
         const mappedCount = (args.variables.ffmpegCommand.streams||[]).filter(s=>s && s.removed===false).length;
-        args.jobLog(`x265 mapped streams: ${mappedCount}`);
+        args.jobLog(`NVENC mapped streams: ${mappedCount}`);
     } catch (e) {}
 
     // Do not change the flow's current file here; let ffmpegCommandExecute

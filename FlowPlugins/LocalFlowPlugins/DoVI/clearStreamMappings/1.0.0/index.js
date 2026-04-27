@@ -11,7 +11,7 @@ const details = () => ({
     tags: 'video',
     isStartPlugin: false,
     pType: '',
-    requiresVersion: '2.11.01',
+    requiresVersion: '2.58.02',
     sidebarPosition: -1,
     icon: '',
     inputs: [],

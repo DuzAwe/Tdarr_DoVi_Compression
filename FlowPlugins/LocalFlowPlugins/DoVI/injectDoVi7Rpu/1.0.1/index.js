@@ -39,10 +39,15 @@ exports.plugin = exports.details = void 0;
 var cliUtils_1 = require("../../../../FlowHelpers/1.0.0/cliUtils");
 var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 
-var details = function () {
+/* 
+  This plugin injects a previously extracted DoVi 7 RPU into a base HEVC stream 
+  or converts a single-stream p7 to p8.
+*/
+
+var details = function () { 
   return {
-    name: 'Package DoVi 7 mkv',
-    description: 'Package HEVC stream with injected DoVi RPU in mkv (Profile 8)',
+    name: 'Inject DoVi RPU 7',
+    description: 'Handles Dolby Vision Profile 7 RPU injection or conversion to Profile 8',
     style: { borderColor: 'orange' },
     tags: 'video',
     isStartPlugin: false,
@@ -52,36 +57,44 @@ var details = function () {
     icon: '',
     inputs: [],
     outputs: [
-      {
-        number: 1,
-        tooltip: 'Continue to next plugin',
-      },
+      { number: 1, tooltip: 'Continue to next plugin' },
     ],
   };
 };
 exports.details = details;
 
-var plugin = function (args) {
+var plugin = function (args) { 
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, outFileName, outFilePath, spawnArgs, cli, res;
+    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, cliString, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           lib = require('../../../../../methods/lib')();
           args.inputs = lib.loadDefaultValues(args.inputs, details);
-          pluginWorkDir = (0, fileUtils_1.getPluginWorkDir)(args);
 
-          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_dolby.mkv";
+          pluginWorkDir = args.workDir + "/dovi_tool";
+          args.deps.fsextra.ensureDirSync(pluginWorkDir);
+
+          // The input HEVC file we want to inject into
+          inputFilePath = args.inputFileObj.file;
+          // The RPU metadata from the previous extraction step
+            rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
+
+          // Our final injected output
+          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_rpu_injected.hevc";
           outFilePath = pluginWorkDir + "/" + outFileName;
 
-          spawnArgs = [
-            '-o',
-            outFilePath,
-            args.inputFileObj.file
-          ];
+          // Inject RPU into the current base stream (post-encode)
+          cliString = 
+            "/usr/local/bin/dovi_tool inject-rpu " +
+            "-i \"" + (args.inputFileObj.file || args.inputFileObj._id) + "\" " +
+            "--rpu-in \"" + rpuFilePath + "\" " +
+            "-o \"" + outFilePath + "\"";
 
+          // We'll run the resulting command in bash
+          spawnArgs = ['-c', cliString];
           cli = new cliUtils_1.CLI({
-            cli: '/usr/bin/mkvmerge',
+            cli: '/bin/bash',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,
@@ -90,19 +103,20 @@ var plugin = function (args) {
             logFullCliOutput: args.logFullCliOutput,
             updateWorker: args.updateWorker,
           });
-
           return [4 /*yield*/, cli.runCli()];
         case 1:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
-            args.jobLog('Packaging stream into mkv failed');
-            throw new Error('mkvmerge failed');
+            args.jobLog('Injecting DoVi RPU failed');
+            throw new Error('dovi_tool failed');
           }
           args.logOutcome('tSuc');
           return [2 /*return*/, {
-            outputFileObj: { _id: outFilePath },
+            outputFileObj: {
+              _id: outFilePath
+            },
             outputNumber: 1,
-            variables: args.variables,
+            variables: args.variables
           }];
       }
     });

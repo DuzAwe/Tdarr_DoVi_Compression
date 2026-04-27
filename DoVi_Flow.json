@@ -32,7 +32,7 @@
       "name": "NVENC - Encode HEVC (P8)",
       "sourceRepo": "Local",
       "pluginName": "nvencEncodeHevc",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "fpEnabled": true,
       "id": "nvEncP8",
       "position": {
@@ -75,7 +75,7 @@
       "name": "NVENC - Encode HEVC (P7)",
       "sourceRepo": "Local",
       "pluginName": "nvencEncodeHevc",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "fpEnabled": true,
       "id": "nvEncP7",
       "position": {
@@ -118,7 +118,7 @@
       "name": "NVENC - Encode HEVC (P7 SL)",
       "sourceRepo": "Local",
       "pluginName": "nvencEncodeHevc",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "fpEnabled": true,
       "id": "nvEncP7S",
       "position": {
@@ -161,7 +161,7 @@
       "name": "NVENC - Encode HEVC (HDR10+)",
       "sourceRepo": "Local",
       "pluginName": "nvencEncodeHevc",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "fpEnabled": true,
       "id": "nvEncHDR",
       "position": {
@@ -712,7 +712,7 @@
       "name": "Fail if output larger than original",
       "sourceRepo": "Local",
       "pluginName": "checkFileNotBigger",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "SizeCheckFinal",
       "position": {
@@ -746,6 +746,18 @@
       "position": {
         "x": 1560,
         "y": 1152
+      }
+    },
+    {
+      "name": "Use Original As Input (x265 fallback)",
+      "sourceRepo": "Local",
+      "pluginName": "useOriginalAsInput",
+      "version": "1.0.1",
+      "fpEnabled": true,
+      "id": "UseOrigX265",
+      "position": {
+        "x": 1560,
+        "y": 1212
       }
     },
     {
@@ -997,7 +1009,7 @@
       "name": "Wrap Raw HEVC in MKV (timestamps)",
       "sourceRepo": "Local",
       "pluginName": "wrapRawHevcWithMkv",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "WrpRawMkv",
       "position": {
@@ -1159,7 +1171,7 @@
       "name": "Check BPP Efficiency",
       "sourceRepo": "Local",
       "pluginName": "checkBPPEfficiency",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "inputsDB": {
         "bpp_threshold": "0.15"
       },
@@ -1239,7 +1251,7 @@
       "name": "Remux DoVi MKV",
       "sourceRepo": "Local",
       "pluginName": "ffmpegCommandRemuxMkvDovi",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "vUOzVHt9o",
       "position": {
@@ -1251,7 +1263,7 @@
       "name": "Check DoVi Profile",
       "sourceRepo": "Local",
       "pluginName": "checkDoViProfile",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "cKu_1q_hA",
       "position": {
@@ -1314,7 +1326,7 @@
       "name": "ffmpeg - Extract Streams DoVI",
       "sourceRepo": "Local",
       "pluginName": "ffmpegCommandExtractStreamsDoVi",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "cSjUerrHe",
       "position": {
@@ -1326,7 +1338,7 @@
       "name": "Check HDR type",
       "sourceRepo": "Local",
       "pluginName": "checkHDRType",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "FAbA1f_6f",
       "position": {
@@ -1338,7 +1350,7 @@
       "name": "Check HDR10 Fallback Metadata",
       "sourceRepo": "Local",
       "pluginName": "checkHdrFallback",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "37PKT3zrW",
       "position": {
@@ -1350,7 +1362,7 @@
       "name": "Extract DoVi 7 RPU",
       "sourceRepo": "Local",
       "pluginName": "extractDoVi7Rpu",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "Zy_hzDk19",
       "position": {
@@ -1362,7 +1374,7 @@
       "name": "Extract DoVi 7 (Dual > Single-Layer)",
       "sourceRepo": "Local",
       "pluginName": "extractDoVi7RpuSingleLayer",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "tpzWvVYop",
       "position": {
@@ -1374,7 +1386,7 @@
       "name": "Extract DoVi RPU",
       "sourceRepo": "Local",
       "pluginName": "extractDoViRpu",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "23DrvLYZ5",
       "position": {
@@ -1386,7 +1398,7 @@
       "name": "Extract HDR10+ Metadata",
       "sourceRepo": "Local",
       "pluginName": "extractHDR10PlusMetadata",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "mT11Eua2J",
       "position": {
@@ -1398,7 +1410,7 @@
       "name": "Inject DoVi RPU 7",
       "sourceRepo": "Local",
       "pluginName": "injectDoVi7Rpu",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "bO2_RoL9u",
       "position": {
@@ -1410,7 +1422,7 @@
       "name": "Inject DoVi 7 (Dual > Single-Layer)",
       "sourceRepo": "Local",
       "pluginName": "injectDoVi7RpuSingleLayer",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "ALl24BWfe",
       "position": {
@@ -1434,7 +1446,7 @@
       "name": "Inject HDR10+ as DoVi P8",
       "sourceRepo": "Local",
       "pluginName": "injectHdr10toDoVi8",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "fpEnabled": true,
       "id": "iZwguD20Q",
       "position": {
@@ -2240,9 +2252,16 @@
     {
       "source": "SetUseX265",
       "sourceHandle": "1",
-      "target": "vzQ6rNJbq",
+      "target": "UseOrigX265",
       "targetHandle": null,
       "id": "setUseX265ToReplaceOriginal"
+    },
+    {
+      "source": "UseOrigX265",
+      "sourceHandle": "1",
+      "target": "mA4SWPwTE",
+      "targetHandle": null,
+      "id": "useOrigX265ToRestart"
     },
     {
       "source": "FGLxLhenh",

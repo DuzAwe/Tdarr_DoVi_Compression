@@ -41,8 +41,8 @@ var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 
 var details = function () {
   return {
-    name: 'Package DoVi 7 mkv',
-    description: 'Package HEVC stream with injected DoVi RPU in mkv (Profile 8)',
+    name: 'Inject DoVi 7 (Dual > Single-Layer)',
+    description: 'Forces single-layer DV if fallback metadata is missing, else normal injection.',
     style: { borderColor: 'orange' },
     tags: 'video',
     isStartPlugin: false,
@@ -52,10 +52,7 @@ var details = function () {
     icon: '',
     inputs: [],
     outputs: [
-      {
-        number: 1,
-        tooltip: 'Continue to next plugin',
-      },
+      { number: 1, tooltip: 'Continue to next plugin' },
     ],
   };
 };
@@ -63,25 +60,72 @@ exports.details = details;
 
 var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, outFileName, outFilePath, spawnArgs, cli, res;
+    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, videoStreamCountCmd, probeRes, videoStreamCount, fallbackMissing, cliString, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           lib = require('../../../../../methods/lib')();
           args.inputs = lib.loadDefaultValues(args.inputs, details);
-          pluginWorkDir = (0, fileUtils_1.getPluginWorkDir)(args);
 
-          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_dolby.mkv";
+          pluginWorkDir = args.workDir + "/dovi_tool";
+          args.deps.fsextra.ensureDirSync(pluginWorkDir);
+
+          inputFilePath = args.inputFileObj.file;
+          rpuFilePath = pluginWorkDir + "/" + (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + ".rpu.bin";
+
+          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_rpu_injected.hevc";
           outFilePath = pluginWorkDir + "/" + outFileName;
 
-          spawnArgs = [
-            '-o',
-            outFilePath,
-            args.inputFileObj.file
-          ];
+          // Check how many streams
+          videoStreamCountCmd = new cliUtils_1.CLI({
+            cli: 'ffprobe',
+            spawnArgs: [
+              '-v', 'error',
+              '-select_streams', 'v',
+              '-show_entries', 'stream=index',
+              '-of', 'csv=p=0',
+              inputFilePath
+            ],
+            spawnOpts: {},
+            jobLog: args.jobLog,
+            inputFileObj: args.inputFileObj,
+            updateWorker: args.updateWorker
+          });
+          return [4 /*yield*/, videoStreamCountCmd.runCli()];
+        case 1:
+          probeRes = _a.sent();
+          videoStreamCount = 1;
+          if (probeRes.cliExitCode === 0 && probeRes.cliOutput) {
+            videoStreamCount = probeRes.cliOutput
+              .split('\n')
+              .filter(function (line) { return line.trim() !== ''; }).length;
+          }
 
+          /*
+            If fallbackMissing => convert --discard (generates a minimal P8 RPU without HDR10 fallback)
+            Otherwise => inject the extracted RPU (which contains HDR10 fallback data)
+          */
+          fallbackMissing = !!args.variables.fallbackMissing; // e.g. set by a prior plugin
+
+          if (fallbackMissing) {
+            // Source lacks HDR10 fallback; generate a minimal DoVi P8 signal via convert
+            cliString =
+              "/usr/local/bin/dovi_tool convert --discard " +
+              "-i \"" + inputFilePath + "\" " +
+              "-o \"" + outFilePath + "\"";
+          } else {
+            // Normal path: inject the extracted RPU (retains HDR10 fallback)
+            cliString =
+              "/usr/local/bin/dovi_tool inject-rpu " +
+              "-i \"" + (args.inputFileObj.file || args.inputFileObj._id) + "\" " +
+              "--rpu-in \"" + rpuFilePath + "\" " +
+              "-o \"" + outFilePath + "\"";
+          }
+
+          // We'll run the resulting command in bash
+          spawnArgs = ['-c', cliString];
           cli = new cliUtils_1.CLI({
-            cli: '/usr/bin/mkvmerge',
+            cli: '/bin/bash',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,
@@ -90,19 +134,20 @@ var plugin = function (args) {
             logFullCliOutput: args.logFullCliOutput,
             updateWorker: args.updateWorker,
           });
-
           return [4 /*yield*/, cli.runCli()];
-        case 1:
+        case 2:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
-            args.jobLog('Packaging stream into mkv failed');
-            throw new Error('mkvmerge failed');
+            args.jobLog('Injecting/Converting DoVi RPU failed');
+            throw new Error('dovi_tool failed');
           }
           args.logOutcome('tSuc');
           return [2 /*return*/, {
-            outputFileObj: { _id: outFilePath },
+            outputFileObj: {
+              _id: outFilePath
+            },
             outputNumber: 1,
-            variables: args.variables,
+            variables: args.variables
           }];
       }
     });

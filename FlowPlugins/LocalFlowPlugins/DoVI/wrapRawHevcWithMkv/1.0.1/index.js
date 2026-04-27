@@ -41,9 +41,9 @@ var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 
 var details = function () {
   return {
-    name: 'Package DoVi 7 mkv',
-    description: 'Package HEVC stream with injected DoVi RPU in mkv (Profile 8)',
-    style: { borderColor: 'orange' },
+    name: 'Wrap Raw HEVC in MKV (timestamps)',
+    description: 'Uses mkvmerge to wrap raw HEVC into MKV and sets default-duration based on the original file FPS to create valid timestamps.',
+    style: { borderColor: '#6efefc' },
     tags: 'video',
     isStartPlugin: false,
     pType: '',
@@ -63,29 +63,70 @@ exports.details = details;
 
 var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, outFileName, outFilePath, spawnArgs, cli, res;
+    var lib, pluginWorkDir, baseName, outputFilePath, fpsStr, streams, i, frameRate, parts, num, den, fpsVal, cliArgs, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           lib = require('../../../../../methods/lib')();
           args.inputs = lib.loadDefaultValues(args.inputs, details);
-          pluginWorkDir = (0, fileUtils_1.getPluginWorkDir)(args);
 
-          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_dolby.mkv";
-          outFilePath = pluginWorkDir + "/" + outFileName;
+          pluginWorkDir = args.workDir + "/mkvmerge_wrap";
+          args.deps.fsextra.ensureDirSync(pluginWorkDir);
 
-          spawnArgs = [
-            '-o',
-            outFilePath,
-            args.inputFileObj.file
+          baseName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id);
+          outputFilePath = pluginWorkDir + "/" + baseName + "_video_wrapped.mkv";
+
+          // Determine FPS from original file metadata.
+          // Prefer avg_frame_rate; fall back to r_frame_rate and validate values.
+          fpsStr = '24000/1001';
+          try {
+            streams = (args.originalLibraryFile.ffProbeData && args.originalLibraryFile.ffProbeData.streams) || [];
+            for (i = 0; i < streams.length; i++) {
+              if (streams[i].codec_type === 'video') {
+                frameRate = streams[i].avg_frame_rate || streams[i].r_frame_rate;
+                if (frameRate && frameRate !== '0/0') {
+                  parts = frameRate.split('/');
+                  if (parts.length === 2) {
+                    num = parseFloat(parts[0]);
+                    den = parseFloat(parts[1]);
+                    if (isFinite(num) && isFinite(den) && den > 0 && num > 0) {
+                      fpsVal = num / den;
+                      if (isFinite(fpsVal) && fpsVal >= 1 && fpsVal <= 240) {
+                        fpsStr = parts[0] + "/" + parts[1];
+                      }
+                    }
+                  } else {
+                    fpsVal = parseFloat(frameRate);
+                    if (isFinite(fpsVal) && fpsVal >= 1 && fpsVal <= 240) {
+                      fpsStr = fpsVal.toFixed(3);
+                    }
+                  }
+                }
+                break;
+              }
+            }
+          } catch (err) {
+            // keep default
+          }
+
+          // mkvmerge: set default-duration for track 0 (video) to FPS to create timestamps
+          cliArgs = [
+            '-o', outputFilePath,
+            '--default-duration', '0:' + fpsStr + 'p',
+            '--no-audio', '--no-subtitles', '--no-chapters',
+            args.inputFileObj.file,
           ];
+
+          spawnArgs = cliArgs
+            .map(function (row) { return row.trim(); })
+            .filter(function (row) { return row !== ''; });
 
           cli = new cliUtils_1.CLI({
             cli: '/usr/bin/mkvmerge',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,
-            outputFilePath: outFilePath,
+            outputFilePath: outputFilePath,
             inputFileObj: args.inputFileObj,
             logFullCliOutput: args.logFullCliOutput,
             updateWorker: args.updateWorker,
@@ -95,12 +136,18 @@ var plugin = function (args) {
         case 1:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
-            args.jobLog('Packaging stream into mkv failed');
+            args.jobLog('mkvmerge wrapping failed');
             throw new Error('mkvmerge failed');
           }
+
           args.logOutcome('tSuc');
+          // Provide the wrapped MKV as the current input file for subsequent plugins
           return [2 /*return*/, {
-            outputFileObj: { _id: outFilePath },
+            outputFileObj: {
+              _id: outputFilePath,
+              file: outputFilePath,
+              fileData: args.inputFileObj.fileData,
+            },
             outputNumber: 1,
             variables: args.variables,
           }];

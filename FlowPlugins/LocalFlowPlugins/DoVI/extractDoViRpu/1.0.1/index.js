@@ -39,10 +39,16 @@ exports.plugin = exports.details = void 0;
 var cliUtils_1 = require("../../../../FlowHelpers/1.0.0/cliUtils");
 var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
 
+/*
+  We remove the forced "-m 2" for Profile 7 extraction,
+  ensuring HDR10 fallback is retained. 
+  For all DV profiles (4,5,7,8), we now just do "extract-rpu" untouched.
+*/
+
 var details = function () {
   return {
-    name: 'Package DoVi 7 mkv',
-    description: 'Package HEVC stream with injected DoVi RPU in mkv (Profile 8)',
+    name: 'Extract DoVi RPU',
+    description: 'Extract Dolby Vision RPU data (handles P4, P5, P8)',
     style: { borderColor: 'orange' },
     tags: 'video',
     isStartPlugin: false,
@@ -63,29 +69,38 @@ exports.details = details;
 
 var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, outFileName, outFilePath, spawnArgs, cli, res;
+    var lib, pluginWorkDir, outputFilePath, doviCliArgs, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
           lib = require('../../../../../methods/lib')();
           args.inputs = lib.loadDefaultValues(args.inputs, details);
-          pluginWorkDir = (0, fileUtils_1.getPluginWorkDir)(args);
 
-          outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_dolby.mkv";
-          outFilePath = pluginWorkDir + "/" + outFileName;
+          pluginWorkDir = args.workDir + "/dovi_tool";
+          args.deps.fsextra.ensureDirSync(pluginWorkDir);
 
-          spawnArgs = [
+          outputFilePath = pluginWorkDir + "/" + (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + ".rpu.bin";
+
+          // Regardless of profile, we now do a raw "extract-rpu"
+          // to ensure no fallback data is discarded
+          doviCliArgs = [
+            'extract-rpu',
+            args.inputFileObj.file,
             '-o',
-            outFilePath,
-            args.inputFileObj.file
+            outputFilePath
           ];
 
+          // Convert args to a clean array
+          spawnArgs = doviCliArgs
+            .map(function (row) { return row.trim(); })
+            .filter(function (row) { return row !== ''; });
+
           cli = new cliUtils_1.CLI({
-            cli: '/usr/bin/mkvmerge',
+            cli: '/usr/local/bin/dovi_tool',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,
-            outputFilePath: outFilePath,
+            outputFilePath: outputFilePath,
             inputFileObj: args.inputFileObj,
             logFullCliOutput: args.logFullCliOutput,
             updateWorker: args.updateWorker,
@@ -95,12 +110,17 @@ var plugin = function (args) {
         case 1:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
-            args.jobLog('Packaging stream into mkv failed');
-            throw new Error('mkvmerge failed');
+            args.jobLog('Extracting DoVi RPU failed');
+            throw new Error('dovi_tool failed');
+          }
+
+          if (!args.deps.fsextra.existsSync(outputFilePath) || args.deps.fsextra.statSync(outputFilePath).size === 0) {
+            args.jobLog('RPU.bin is missing or empty after extraction');
+            throw new Error('dovi_tool produced no RPU output');
           }
           args.logOutcome('tSuc');
           return [2 /*return*/, {
-            outputFileObj: { _id: outFilePath },
+            outputFileObj: args.inputFileObj,
             outputNumber: 1,
             variables: args.variables,
           }];

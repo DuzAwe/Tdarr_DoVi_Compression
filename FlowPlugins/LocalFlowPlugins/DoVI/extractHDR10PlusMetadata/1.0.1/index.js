@@ -39,10 +39,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.plugin = exports.details = void 0;
 var cliUtils_1 = require("../../../../FlowHelpers/1.0.0/cliUtils");
 var fileUtils_1 = require("../../../../FlowHelpers/1.0.0/fileUtils");
-/* eslint no-plusplus: ["error", { "allowForLoopAfterthoughts": true }] */
 var details = function () { return ({
-    name: 'Inject DoVi RPU',
-    description: 'Inject Dolby Vision RPU data',
+    name: 'Extract HDR10+ Metadata',
+    description: 'Extract HDR10+ metadata to JSON',
     style: {
         borderColor: 'orange',
     },
@@ -61,31 +60,20 @@ var details = function () { return ({
     ],
 }); };
 exports.details = details;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, rpuFilePath, outputFilePath, cliArgs, spawnArgs, cli, res;
+    var lib, pluginWorkDir, outputFilePath, shellCmd, spawnArgs, cli, res;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 lib = require('../../../../../methods/lib')();
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars,no-param-reassign
                 args.inputs = lib.loadDefaultValues(args.inputs, details);
-                pluginWorkDir = "".concat(args.workDir, "/dovi_tool");
+                pluginWorkDir = "".concat(args.workDir, "/hdr10plus_tool");
                 args.deps.fsextra.ensureDirSync(pluginWorkDir);
-                rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
-                outputFilePath = "".concat((0, fileUtils_1.getPluginWorkDir)(args), "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.hevc");
-                cliArgs = [
-                    'inject-rpu',
-                    '-i',
-                    "".concat(args.inputFileObj.file || args.inputFileObj._id),
-                    '--rpu-in',
-                    "".concat(rpuFilePath),
-                    '-o',
-                    "".concat(outputFilePath),
-                ];
-                spawnArgs = cliArgs.map(function (row) { return row.trim(); }).filter(function (row) { return row !== ''; });
+                outputFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), "_hdr10plus_metadata.json");
+                shellCmd = "ffmpeg -i \"".concat(args.inputFileObj.file, "\" -y -loglevel error -stats -map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | /usr/local/bin/hdr10plus_tool extract -o \"").concat(outputFilePath, "\" -");
+                spawnArgs = ['-c', shellCmd];
                 cli = new cliUtils_1.CLI({
-                    cli: '/usr/local/bin/dovi_tool',
+                    cli: '/bin/sh',
                     spawnArgs: spawnArgs,
                     spawnOpts: {},
                     jobLog: args.jobLog,
@@ -98,14 +86,16 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
             case 1:
                 res = _a.sent();
                 if (res.cliExitCode !== 0) {
-                    args.jobLog('Injecting DoVi RPU failed');
-                    throw new Error('dovi_tool failed');
+                    args.jobLog('Extracting HDR10+ metadata failed');
+                    throw new Error('hdr10plus_tool failed');
+                }
+                if (!args.deps.fsextra.existsSync(outputFilePath) || args.deps.fsextra.statSync(outputFilePath).size === 0) {
+                    args.jobLog('HDR10+ metadata JSON is missing or empty');
+                    throw new Error('hdr10plus_tool produced no output');
                 }
                 args.logOutcome('tSuc');
                 return [2 /*return*/, {
-                        outputFileObj: {
-                            _id: outputFilePath,
-                        },
+                        outputFileObj: args.inputFileObj,
                         outputNumber: 1,
                         variables: args.variables,
                     }];
