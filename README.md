@@ -170,26 +170,6 @@ You can adjust these in the flow nodes if needed.
 
 ---
 
-## Recent Improvements (Dec 2025)
-
-After additional testing across diverse Dolby Vision sources, the encoding settings have been refined for better efficiency and stability:
-
-- **NVENC (hevc_nvenc):**
-   - Added fixed GOP: `-g 600 -keyint_min 600` plus `-strict_gop 1` for consistent segmenting
-   - Removed AQ flags (`-spatial_aq`, `-temporal-aq`, `-aq-strength`) to improve efficiency and avoid edge cases
-   - Kept `-rc-lookahead 32` and `-tune hq` for strong rate control and quality
-   - Conditional `-weighted_pred 1` only when B-frames are disabled to prevent NVENC init errors
-   - **Increased min bitrate multiplier from 0.5 to 0.8** for tighter rate control and more consistent compression
-   - Bitrate calculation now uses extracted stream size (video-only) instead of container bitrate
-   - Retains adaptive bitrate caps and HDR metadata preservation
-
-- **x265 (libx265):**
-   - Uses fixed `-g 600` (no `keyint_min`) to allow scene-cut keyframes for quality on cuts
-   - Enforces VBV when adaptive bitrate is active; preserves HDR mastering and MaxCLL
-   - Bitrate calculation prioritizes extracted stream size for accurate video-only targets
-
-Overall result: smaller or equal file sizes with steadier playback characteristics, improved hardware encoder reliability, and consistent GOP structure across both lanes.
-
 ## Encoding Parameters & Defaults
 
 ### NVENC (Hardware) Encoder
