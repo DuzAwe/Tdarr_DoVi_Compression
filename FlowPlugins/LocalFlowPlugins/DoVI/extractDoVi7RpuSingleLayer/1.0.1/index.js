@@ -112,18 +112,26 @@ var plugin = function (args) {
             args.jobLog('Detected multiple video streams. Extracting RPU from first video stream (0:v:0).');
           }
 
-          // We do a raw "extract-rpu" with no forced -m 2, so we keep original RPU
+          // We do a raw "extract-rpu" with no forced -m 2, so we keep original RPU.
+          // Input/output paths are passed via environment variables (not interpolated
+          // into the shell string) so a filename containing quotes, "$()", or ";"
+          // can never be re-interpreted as shell syntax.
           ffmpegCmd =
-            "ffmpeg -y -loglevel error -stats " +
-            "-i \"" + args.inputFileObj.file + "\" " +
-            "-map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | " +
-            "/usr/local/bin/dovi_tool extract-rpu - -o \"" + outputFilePath + "\"";
+            'ffmpeg -y -loglevel error -stats ' +
+            '-i "$DOVI_INPUT_FILE" ' +
+            '-map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | ' +
+            '/usr/local/bin/dovi_tool extract-rpu - -o "$DOVI_OUTPUT_FILE"';
 
           spawnArgs = ['-c', ffmpegCmd];
           cli = new cliUtils_1.CLI({
             cli: '/bin/bash',
             spawnArgs: spawnArgs,
-            spawnOpts: {},
+            spawnOpts: {
+              env: Object.assign({}, process.env, {
+                DOVI_INPUT_FILE: args.inputFileObj.file,
+                DOVI_OUTPUT_FILE: outputFilePath,
+              }),
+            },
             jobLog: args.jobLog,
             outputFilePath: outputFilePath,
             inputFileObj: args.inputFileObj,

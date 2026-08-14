@@ -60,7 +60,7 @@ exports.details = details;
 
 var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, videoStreamCountCmd, probeRes, videoStreamCount, fallbackMissing, cliString, spawnArgs, cli, res;
+    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, videoStreamCountCmd, probeRes, videoStreamCount, fallbackMissing, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -109,23 +109,31 @@ var plugin = function (args) {
 
           if (fallbackMissing) {
             // Source lacks HDR10 fallback; generate a minimal DoVi P8 signal via convert
-            cliString =
-              "/usr/local/bin/dovi_tool convert --discard " +
-              "-i \"" + inputFilePath + "\" " +
-              "-o \"" + outFilePath + "\"";
+            spawnArgs = [
+              'convert',
+              '--discard',
+              '-i',
+              inputFilePath,
+              '-o',
+              outFilePath,
+            ];
           } else {
             // Normal path: inject the extracted RPU (retains HDR10 fallback)
-            cliString =
-              "/usr/local/bin/dovi_tool inject-rpu " +
-              "-i \"" + (args.inputFileObj.file || args.inputFileObj._id) + "\" " +
-              "--rpu-in \"" + rpuFilePath + "\" " +
-              "-o \"" + outFilePath + "\"";
+            spawnArgs = [
+              'inject-rpu',
+              '-i',
+              (args.inputFileObj.file || args.inputFileObj._id),
+              '--rpu-in',
+              rpuFilePath,
+              '-o',
+              outFilePath,
+            ];
           }
 
-          // We'll run the resulting command in bash
-          spawnArgs = ['-c', cliString];
+          // Run dovi_tool directly (no shell) so file paths can never be
+          // re-interpreted as shell syntax.
           cli = new cliUtils_1.CLI({
-            cli: '/bin/bash',
+            cli: '/usr/local/bin/dovi_tool',
             spawnArgs: spawnArgs,
             spawnOpts: {},
             jobLog: args.jobLog,

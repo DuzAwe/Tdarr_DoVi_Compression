@@ -70,12 +70,20 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                 pluginWorkDir = "".concat(args.workDir, "/hdr10plus_tool");
                 args.deps.fsextra.ensureDirSync(pluginWorkDir);
                 outputFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), "_hdr10plus_metadata.json");
-                shellCmd = "ffmpeg -i \"".concat(args.inputFileObj.file, "\" -y -loglevel error -stats -map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | /usr/local/bin/hdr10plus_tool extract -o \"").concat(outputFilePath, "\" -");
+                // Input/output paths are passed via environment variables (not interpolated
+                // into the shell string) so a filename containing quotes, "$()", or ";"
+                // can never be re-interpreted as shell syntax.
+                shellCmd = 'ffmpeg -i "$DOVI_INPUT_FILE" -y -loglevel error -stats -map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | /usr/local/bin/hdr10plus_tool extract -o "$DOVI_OUTPUT_FILE" -';
                 spawnArgs = ['-c', shellCmd];
                 cli = new cliUtils_1.CLI({
                     cli: '/bin/sh',
                     spawnArgs: spawnArgs,
-                    spawnOpts: {},
+                    spawnOpts: {
+                        env: Object.assign({}, process.env, {
+                            DOVI_INPUT_FILE: args.inputFileObj.file,
+                            DOVI_OUTPUT_FILE: outputFilePath,
+                        }),
+                    },
                     jobLog: args.jobLog,
                     outputFilePath: outputFilePath,
                     inputFileObj: args.inputFileObj,

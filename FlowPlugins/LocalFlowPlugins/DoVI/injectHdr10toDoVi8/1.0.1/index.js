@@ -70,7 +70,7 @@ var details = function () { return ({
 exports.details = details;
 
 var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var lib, injectWorkDir, extractWorkDir, baseName, metaFilePath, rpuBinPath, extraJsonPath, blHevcPath, outHevcPath, shellCmd1, cli1, res1, shellCmd2, cli2, res2, shellCmd3, cli3, res3;
+    var lib, injectWorkDir, extractWorkDir, baseName, metaFilePath, rpuBinPath, extraJsonPath, blHevcPath, outHevcPath, cli1, res1, cli2, res2, cli3, res3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -111,11 +111,19 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                     }
                 }, null, 2));
 
-                // 1) Extract base layer to BL.hevc
-                shellCmd1 = "ffmpeg -i \"".concat(args.inputFileObj.file, "\" -y -loglevel error -stats -map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc \"").concat(blHevcPath, "\"");
+                // 1) Extract base layer to BL.hevc — run ffmpeg directly (no shell)
+                // so file paths can never be re-interpreted as shell syntax.
                 cli1 = new cliUtils_1.CLI({
-                    cli: '/bin/sh',
-                    spawnArgs: ['-c', shellCmd1],
+                    cli: 'ffmpeg',
+                    spawnArgs: [
+                        '-i', args.inputFileObj.file,
+                        '-y', '-loglevel', 'error', '-stats',
+                        '-map', '0:v:0',
+                        '-c:v', 'copy',
+                        '-bsf:v', 'hevc_mp4toannexb',
+                        '-f', 'hevc',
+                        blHevcPath,
+                    ],
                     spawnOpts: {},
                     jobLog: args.jobLog,
                     outputFilePath: blHevcPath,
@@ -136,10 +144,14 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                 }
 
                 // 2) Generate RPU from HDR10+ JSON
-                shellCmd2 = "/usr/local/bin/dovi_tool generate -j \"".concat(extraJsonPath, "\" --hdr10plus-json \"").concat(metaFilePath, "\" -o \"").concat(rpuBinPath, "\"");
                 cli2 = new cliUtils_1.CLI({
-                    cli: '/bin/sh',
-                    spawnArgs: ['-c', shellCmd2],
+                    cli: '/usr/local/bin/dovi_tool',
+                    spawnArgs: [
+                        'generate',
+                        '-j', extraJsonPath,
+                        '--hdr10plus-json', metaFilePath,
+                        '-o', rpuBinPath,
+                    ],
                     spawnOpts: {},
                     jobLog: args.jobLog,
                     outputFilePath: rpuBinPath,
@@ -160,10 +172,14 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                 }
 
                 // 3) Inject RPU => DoVi P8
-                shellCmd3 = "/usr/local/bin/dovi_tool inject-rpu -i \"".concat(blHevcPath, "\" --rpu-in \"").concat(rpuBinPath, "\" -o \"").concat(outHevcPath, "\"");
                 cli3 = new cliUtils_1.CLI({
-                    cli: '/bin/sh',
-                    spawnArgs: ['-c', shellCmd3],
+                    cli: '/usr/local/bin/dovi_tool',
+                    spawnArgs: [
+                        'inject-rpu',
+                        '-i', blHevcPath,
+                        '--rpu-in', rpuBinPath,
+                        '-o', outHevcPath,
+                    ],
                     spawnOpts: {},
                     jobLog: args.jobLog,
                     outputFilePath: outHevcPath,
