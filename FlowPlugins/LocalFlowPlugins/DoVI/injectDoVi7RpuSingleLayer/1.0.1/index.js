@@ -60,7 +60,7 @@ exports.details = details;
 
 var plugin = function (args) {
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, videoStreamCountCmd, probeRes, videoStreamCount, fallbackMissing, spawnArgs, cli, res;
+    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -71,64 +71,37 @@ var plugin = function (args) {
           args.deps.fsextra.ensureDirSync(pluginWorkDir);
 
           inputFilePath = args.inputFileObj.file;
+          // Extract DoVi 7 (Dual > Single-Layer) already ran extract-rpu with the
+          // "-m 2" global mode flag, so this RPU is already Profile 8.1-compatible
+          // (FEL-only luma/chroma mapping stripped) regardless of whether HDR10
+          // fallback (L6) metadata was present in the source.
           rpuFilePath = pluginWorkDir + "/" + (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + ".rpu.bin";
 
           outFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_rpu_injected.hevc";
           outFilePath = pluginWorkDir + "/" + outFileName;
 
-          // Check how many streams
-          videoStreamCountCmd = new cliUtils_1.CLI({
-            cli: 'ffprobe',
-            spawnArgs: [
-              '-v', 'error',
-              '-select_streams', 'v',
-              '-show_entries', 'stream=index',
-              '-of', 'csv=p=0',
-              inputFilePath
-            ],
-            spawnOpts: {},
-            jobLog: args.jobLog,
-            inputFileObj: args.inputFileObj,
-            updateWorker: args.updateWorker
-          });
-          return [4 /*yield*/, videoStreamCountCmd.runCli()];
-        case 1:
-          probeRes = _a.sent();
-          videoStreamCount = 1;
-          if (probeRes.cliExitCode === 0 && probeRes.cliOutput) {
-            videoStreamCount = probeRes.cliOutput
-              .split('\n')
-              .filter(function (line) { return line.trim() !== ''; }).length;
-          }
-
-          /*
-            If fallbackMissing => convert --discard (generates a minimal P8 RPU without HDR10 fallback)
-            Otherwise => inject the extracted RPU (which contains HDR10 fallback data)
-          */
-          fallbackMissing = !!args.variables.fallbackMissing; // e.g. set by a prior plugin
-
-          if (fallbackMissing) {
-            // Source lacks HDR10 fallback; generate a minimal DoVi P8 signal via convert
-            spawnArgs = [
-              'convert',
-              '--discard',
-              '-i',
-              inputFilePath,
-              '-o',
-              outFilePath,
-            ];
-          } else {
-            // Normal path: inject the extracted RPU (retains HDR10 fallback)
-            spawnArgs = [
-              'inject-rpu',
-              '-i',
-              (args.inputFileObj.file || args.inputFileObj._id),
-              '--rpu-in',
-              rpuFilePath,
-              '-o',
-              outFilePath,
-            ];
-          }
+          // Inject the already mode-2-converted RPU into the newly encoded base
+          // layer. Note: dovi_tool's inject-rpu ignores global options, so mode
+          // conversion must happen at extraction time (above), not here.
+          //
+          // We previously used "convert --discard" here when HDR10 fallback
+          // metadata was missing, but that ran against inputFilePath - the
+          // freshly NVENC/x265-encoded HEVC - which never has an RPU embedded
+          // in it to convert in the first place (RPU injection always happens
+          // as a separate later step). That path was a silent no-op that
+          // produced a stream with no Dolby Vision metadata at all, while
+          // downstream packaging still tagged the container as Dolby Vision -
+          // exactly the kind of mismatch that breaks playback. Always
+          // inject-rpu the extracted (and mode-2-converted) RPU instead.
+          spawnArgs = [
+            'inject-rpu',
+            '-i',
+            (inputFilePath || args.inputFileObj._id),
+            '--rpu-in',
+            rpuFilePath,
+            '-o',
+            outFilePath,
+          ];
 
           // Run dovi_tool directly (no shell) so file paths can never be
           // re-interpreted as shell syntax.
@@ -143,7 +116,7 @@ var plugin = function (args) {
             updateWorker: args.updateWorker,
           });
           return [4 /*yield*/, cli.runCli()];
-        case 2:
+        case 1:
           res = _a.sent();
           if (res.cliExitCode !== 0) {
             args.jobLog('Injecting/Converting DoVi RPU failed');

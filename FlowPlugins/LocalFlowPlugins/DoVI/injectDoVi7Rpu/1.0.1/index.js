@@ -65,7 +65,7 @@ exports.details = details;
 
 var plugin = function (args) { 
   return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, spawnArgs, cli, res, fs, elFilePath, elStat, muxFileName, muxFilePath, muxSpawnArgs, muxCli, muxRes, finalFilePath;
+    var lib, pluginWorkDir, inputFilePath, rpuFilePath, outFileName, outFilePath, spawnArgs, cli, res;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -77,7 +77,9 @@ var plugin = function (args) {
 
           // The input HEVC file we want to inject into
           inputFilePath = args.inputFileObj.file;
-          // The RPU metadata from the previous extraction step
+          // The RPU metadata from the previous extraction step (Extract DoVi 7 RPU
+          // already converted this to Profile 8.1-compatible metadata via "-m 2",
+          // since dovi_tool's global mode option has no effect on inject-rpu itself).
             rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
 
           // Our final injected output
@@ -112,74 +114,10 @@ var plugin = function (args) {
             args.jobLog('Injecting DoVi RPU failed');
             throw new Error('dovi_tool failed');
           }
-
-          // If Extract DoVi 7 RPU demuxed a true enhancement layer (EL) for this
-          // source, re-mux it back onto the newly encoded + RPU-injected base
-          // layer now. This is what actually preserves dual-layer (FEL/MEL)
-          // Dolby Vision instead of silently dropping the EL during re-encode.
-          fs = args.deps.fs || require('fs');
-          elFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".el.hevc");
-          elStat = fs.existsSync(elFilePath) ? fs.statSync(elFilePath) : null;
-
-          if (!elStat || !elStat.size) {
-            // No EL was demuxed (base-layer-only source, or demux found nothing) -
-            // keep existing behavior: output the RPU-injected base layer as-is.
-            args.jobLog('No enhancement layer (EL) file found; outputting base-layer-only Dolby Vision stream.');
-            args.logOutcome('tSuc');
-            return [2 /*return*/, {
-              outputFileObj: {
-                _id: outFilePath
-              },
-              outputNumber: 1,
-              variables: args.variables
-            }];
-          }
-
-          muxFileName = (0, fileUtils_1.getFileName)(args.originalLibraryFile._id) + "_dovi7_dual_layer.hevc";
-          muxFilePath = pluginWorkDir + "/" + muxFileName;
-          muxSpawnArgs = [
-            'mux',
-            '-b',
-            outFilePath,
-            '-e',
-            elFilePath,
-            '-o',
-            muxFilePath,
-          ];
-          muxCli = new cliUtils_1.CLI({
-            cli: '/usr/local/bin/dovi_tool',
-            spawnArgs: muxSpawnArgs,
-            spawnOpts: {},
-            jobLog: args.jobLog,
-            outputFilePath: muxFilePath,
-            inputFileObj: args.inputFileObj,
-            logFullCliOutput: args.logFullCliOutput,
-            updateWorker: args.updateWorker,
-          });
-          return [4 /*yield*/, muxCli.runCli()];
-        case 2:
-          muxRes = _a.sent();
-          if (muxRes.cliExitCode !== 0 || !fs.existsSync(muxFilePath) || !fs.statSync(muxFilePath).size) {
-            // Muxing the EL back on failed - fall back to the base-layer-only
-            // output rather than failing the whole job, but make it loud in the
-            // log since this means dual-layer data was NOT preserved this run.
-            args.jobLog('Re-muxing enhancement layer (EL) onto base layer failed; falling back to base-layer-only output.');
-            args.logOutcome('tSuc');
-            return [2 /*return*/, {
-              outputFileObj: {
-                _id: outFilePath
-              },
-              outputNumber: 1,
-              variables: args.variables
-            }];
-          }
-
-          finalFilePath = muxFilePath;
-          args.jobLog('Re-muxed enhancement layer (EL) onto encoded base layer: ' + finalFilePath);
           args.logOutcome('tSuc');
           return [2 /*return*/, {
             outputFileObj: {
-              _id: finalFilePath
+              _id: outFilePath
             },
             outputNumber: 1,
             variables: args.variables

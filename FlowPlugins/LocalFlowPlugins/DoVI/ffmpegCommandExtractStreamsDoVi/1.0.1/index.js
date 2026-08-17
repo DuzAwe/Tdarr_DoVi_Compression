@@ -4,9 +4,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.plugin = exports.details = void 0;
 /* eslint-disable no-param-reassign */
 
-const { CLI } = require('../../../../FlowHelpers/1.0.0/cliUtils');
-const { getFileName } = require('../../../../FlowHelpers/1.0.0/fileUtils');
-
 const details = () => ({
     name: 'ffmpeg - Extract Streams DoVI',
     description: "Extract raw HEVC from file only. Subtitles are left untouched to be included during the final remux.",
@@ -30,7 +27,6 @@ const details = () => ({
 exports.details = details;
 
 var plugin = function (args) {
-    return (async () => {
     const lib = require('../../../../../methods/lib')();
     args.inputs = lib.loadDefaultValues(args.inputs, details);
 
@@ -49,22 +45,15 @@ var plugin = function (args) {
     const baseNameWithoutYear = originalFileName.replace(/\s\(\d{4}\)/, '').replace(/\.[^/.]+$/, '');
 
     const streams = args.variables.ffmpegCommand.streams;
-    // Some Dolby Vision Profile 7 dual-layer sources expose the base layer (BL)
-    // and enhancement layer (EL) as two genuinely separate ffprobe video
-    // streams (rather than the more common single combined bitstream with the
-    // EL interleaved as extra NAL units). Raw .hevc has no container
-    // structure, so mapping more than one video stream into it interleaves
-    // both bitstreams' NAL units into a single corrupted file. Only the first
-    // (lowest-index) video stream is ever used downstream for the main raw
-    // HEVC output (RPU extraction/injection/encode all operate on 0:v:0), so
-    // keep just that one in the primary ffmpeg command.
-    //
-    // When a second video stream IS present, it is separately extracted below
-    // (via its own ffmpeg run) into a sidecar "*.el.hevc" file so it survives
-    // as the true enhancement layer. Extract DoVi 7 RPU / Inject DoVi RPU 7
-    // will pick this file up automatically (by the same deterministic
-    // filename) and re-mux it onto the newly encoded base layer, instead of
-    // permanently losing it.
+    // For genuine dual-layer sources (e.g. Profile 7 stored as two separate
+    // video elementary streams: base layer + enhancement layer), raw .hevc
+    // has no container structure, so mapping more than one video stream into
+    // it interleaves both bitstreams' NAL units into a single corrupted file.
+    // Only the first (lowest-index) video stream is ever used downstream
+    // (RPU extraction/injection all operate on 0:v:0), so keep just that one
+    // here and drop any additional video streams. Per this flow's design, DoVi
+    // Profile 7 sources always end up converted to a single-layer Profile 8
+    // output, so an enhancement layer is never carried through regardless.
     let firstVideoStreamKept = false;
     let extraVideoStreamsDropped = 0;
     streams.forEach((stream) => {
@@ -87,39 +76,8 @@ var plugin = function (args) {
     });
     if (extraVideoStreamsDropped > 0) {
         args.jobLog(`Detected ${extraVideoStreamsDropped} additional video stream(s) (e.g. dual-layer DoVi enhancement layer). `
-            + 'Only the first video stream is kept in the raw HEVC output; the second video stream is separately '
-            + 'extracted as the enhancement layer (EL) below so it can be re-muxed back in after encoding.');
-
-        const pluginWorkDir = `${args.workDir}/dovi_tool`;
-        args.deps.fsextra.ensureDirSync(pluginWorkDir);
-        const elFilePath = `${pluginWorkDir}/${getFileName(args.originalLibraryFile._id)}.el.hevc`;
-
-        const elCli = new CLI({
-            cli: 'ffmpeg',
-            spawnArgs: [
-                '-y', '-loglevel', 'error', '-stats',
-                '-i', args.inputFileObj.file,
-                '-map', '0:v:1',
-                '-c:v', 'copy',
-                '-bsf:v', 'hevc_mp4toannexb',
-                '-f', 'hevc',
-                elFilePath,
-            ],
-            spawnOpts: {},
-            jobLog: args.jobLog,
-            outputFilePath: elFilePath,
-            inputFileObj: args.inputFileObj,
-            logFullCliOutput: args.logFullCliOutput,
-            updateWorker: args.updateWorker,
-        });
-        const elRes = await elCli.runCli();
-        const fs = args.deps.fs || require('fs');
-        if (elRes.cliExitCode === 0 && fs.existsSync(elFilePath) && fs.statSync(elFilePath).size > 0) {
-            args.jobLog(`Extracted separate enhancement layer (EL) stream to: ${elFilePath}`);
-        } else {
-            args.jobLog('Failed to extract the second video stream as a separate enhancement layer (EL); '
-                + 'Extract DoVi 7 RPU will fall back to demuxing the EL from the combined base layer bitstream instead.');
-        }
+            + 'Only the first video stream is extracted to raw HEVC; extra video streams are dropped here to avoid '
+            + 'corrupting the raw HEVC output.');
     }
 
     return {
@@ -127,7 +85,6 @@ var plugin = function (args) {
         outputNumber: 1,
         variables: args.variables,
     };
-    })();
 };
 
 exports.plugin = plugin;

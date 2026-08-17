@@ -112,7 +112,14 @@ var plugin = function (args) {
             args.jobLog('Detected multiple video streams. Extracting RPU from first video stream (0:v:0).');
           }
 
-          // We do a raw "extract-rpu" with no forced -m 2, so we keep original RPU.
+          // This branch runs when HDR10 fallback (L6) metadata is missing from
+          // the source RPU. "-m 2" is a dovi_tool GLOBAL option (must precede
+          // the subcommand) that rewrites the RPU to be Profile 8.1-compatible,
+          // stripping the FEL-only luma/chroma mapping that requires an
+          // enhancement layer to apply (the EL will not be carried through).
+          // Without this, the extracted RPU stays flagged/structured as
+          // Profile 7 even though only a single layer is produced downstream -
+          // a mismatch that can break playback on strict decoders.
           // Input/output paths are passed via environment variables (not interpolated
           // into the shell string) so a filename containing quotes, "$()", or ";"
           // can never be re-interpreted as shell syntax.
@@ -120,7 +127,7 @@ var plugin = function (args) {
             'ffmpeg -y -loglevel error -stats ' +
             '-i "$DOVI_INPUT_FILE" ' +
             '-map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | ' +
-            '/usr/local/bin/dovi_tool extract-rpu - -o "$DOVI_OUTPUT_FILE"';
+            '/usr/local/bin/dovi_tool -m 2 extract-rpu - -o "$DOVI_OUTPUT_FILE"';
 
           spawnArgs = ['-c', ffmpegCmd];
           cli = new cliUtils_1.CLI({
