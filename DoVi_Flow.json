@@ -1042,21 +1042,6 @@
       }
     },
     {
-      "name": "Execute DoVi Remux",
-      "sourceRepo": "Community",
-      "pluginName": "ffmpegCommandExecute",
-      "version": "1.0.0",
-      "inputsDB": {
-        "dryRun": "false"
-      },
-      "fpEnabled": true,
-      "id": "O05LOTxgZ",
-      "position": {
-        "x": 1344,
-        "y": 816
-      }
-    },
-    {
       "name": "Set mkv Container",
       "sourceRepo": "Community",
       "pluginName": "ffmpegCommandSetContainer",
@@ -1248,10 +1233,10 @@
       }
     },
     {
-      "name": "Remux DoVi MKV",
+      "name": "Remux DoVi MKV (mkvmerge)",
       "sourceRepo": "Local",
-      "pluginName": "ffmpegCommandRemuxMkvDovi",
-      "version": "1.0.1",
+      "pluginName": "mkvmergeRemuxDovi",
+      "version": "1.0.0",
       "fpEnabled": true,
       "id": "vUOzVHt9o",
       "position": {
@@ -1587,7 +1572,7 @@
     {
       "source": "vUOzVHt9o",
       "sourceHandle": "1",
-      "target": "O05LOTxgZ",
+      "target": "UpP4mFtqG",
       "targetHandle": null,
       "id": "hYSgN0A2v"
     },
@@ -1898,13 +1883,6 @@
       "target": "lC9xV8Swo",
       "targetHandle": null,
       "id": "5bOWx8h_Y"
-    },
-    {
-      "source": "O05LOTxgZ",
-      "sourceHandle": "1",
-      "target": "UpP4mFtqG",
-      "targetHandle": null,
-      "id": "-if76hPG-"
     },
     {
       "source": "UpP4mFtqG",
