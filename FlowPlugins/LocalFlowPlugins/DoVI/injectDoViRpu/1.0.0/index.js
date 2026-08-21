@@ -62,8 +62,19 @@ var details = function () { return ({
 }); };
 exports.details = details;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// Per the ST 2084 (PQ) spec, mastering-display luminance can never exceed
+// 10000 nits. dovi_tool's own RPU parsing hard-validates the L6 fallback
+// block against this ceiling with no bypass flag - it will refuse to run
+// inject-rpu (hard-failing the job) if the source encoded an out-of-spec
+// value (seen in the wild on some Blu-ray remuxes with buggy DoVi authoring,
+// e.g. 23040 or 38528 nits). We always pass --edit-config with an L6
+// override clamped to the max legal value: harmless no-op for already
+// in-spec files, and lets out-of-spec files inject successfully while still
+// signalling "very bright" fallback to non-DoVi displays.
+var MAX_PQ_LUMINANCE = 10000;
+
 var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, rpuFilePath, outputFilePath, cliArgs, spawnArgs, cli, res;
+    var lib, pluginWorkDir, rpuFilePath, outputFilePath, editConfigPath, fs, cliArgs, spawnArgs, cli, res;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -74,7 +85,16 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                 args.deps.fsextra.ensureDirSync(pluginWorkDir);
                 rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
                 outputFilePath = "".concat((0, fileUtils_1.getPluginWorkDir)(args), "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.hevc");
+                editConfigPath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".edit_config.json");
+                fs = args.deps.fs || require('fs');
+                fs.writeFileSync(editConfigPath, JSON.stringify({
+                    level6: {
+                        max_display_mastering_luminance: MAX_PQ_LUMINANCE,
+                    },
+                }, null, 2));
                 cliArgs = [
+                    '--edit-config',
+                    "".concat(editConfigPath),
                     'inject-rpu',
                     '-i',
                     "".concat(args.inputFileObj.file || args.inputFileObj._id),
