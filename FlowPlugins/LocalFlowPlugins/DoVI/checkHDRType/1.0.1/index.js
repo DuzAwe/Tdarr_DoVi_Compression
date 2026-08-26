@@ -80,7 +80,33 @@ var plugin = function (args) {
     }
   }
 
-  // 2) If still not DV or HDR10+, check ffProbe data for standard HDR10.
+  // 2) If MediaInfo didn't flag DV or HDR10+ (e.g. some MP4/dvhe remuxes don't
+  //    surface HDR_Format/HDR_Format_Commercial the way MKV containers do),
+  //    fall back to ffProbe's codec_tag_string/codec_name for the Dolby
+  //    Vision FourCCs (dvhe = HEVC w/ DV base+enhancement or profile 8;
+  //    dvh1 = HEVC w/ DV, alternate parameter-set placement; dvav/dva1 for
+  //    AVC-based DV). Seen in the wild: Ip Man 4 (MP4, dvhe) had no DV
+  //    markers in MediaInfo at all despite being a genuine DV Profile 8 file.
+  if (outputNum === 4) {
+    if (
+      args.inputFileObj &&
+      args.inputFileObj.ffProbeData &&
+      Array.isArray(args.inputFileObj.ffProbeData.streams)
+    ) {
+      for (var j = 0; j < args.inputFileObj.ffProbeData.streams.length; j++) {
+        var vStream = args.inputFileObj.ffProbeData.streams[j];
+        if (vStream.codec_type === 'video') {
+          var codecTag = String(vStream.codec_tag_string || '').toLowerCase();
+          if (/^dv(he|h1|av|a1)$/.test(codecTag)) {
+            outputNum = 1; // Dolby Vision
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // 3) If still not DV or HDR10+, check ffProbe data for standard HDR10.
   //    If we see color_transfer=smpte2084 etc. => It's HDR10 unless already set.
   if (outputNum === 4) {
     if (
