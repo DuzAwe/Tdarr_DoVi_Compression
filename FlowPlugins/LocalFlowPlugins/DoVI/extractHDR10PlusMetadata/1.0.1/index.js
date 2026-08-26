@@ -73,7 +73,11 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                 // Input/output paths are passed via environment variables (not interpolated
                 // into the shell string) so a filename containing quotes, "$()", or ";"
                 // can never be re-interpreted as shell syntax.
-                shellCmd = 'ffmpeg -i "$DOVI_INPUT_FILE" -y -loglevel error -stats -map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | /usr/local/bin/hdr10plus_tool extract -o "$DOVI_OUTPUT_FILE" -';
+                // -l/--limit is set high (not to actually limit frames) so that
+                // hdr10plus_tool's own truncate-to-frame-count safety path runs.
+                // Without it, a source with one extra/orphan HDR10+ SEI (vs decoded
+                // frame count) hits a hard `ensure!` panic instead of being trimmed.
+                shellCmd = 'ffmpeg -i "$DOVI_INPUT_FILE" -y -loglevel error -stats -map 0:v:0 -c:v copy -bsf:v hevc_mp4toannexb -f hevc - | /usr/local/bin/hdr10plus_tool extract -l 999999999 -o "$DOVI_OUTPUT_FILE" -';
                 spawnArgs = ['-c', shellCmd];
                 cli = new cliUtils_1.CLI({
                     cli: '/bin/sh',
