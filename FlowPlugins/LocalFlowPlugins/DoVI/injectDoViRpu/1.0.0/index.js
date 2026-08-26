@@ -67,14 +67,20 @@ exports.details = details;
 // block against this ceiling with no bypass flag - it will refuse to run
 // inject-rpu (hard-failing the job) if the source encoded an out-of-spec
 // value (seen in the wild on some Blu-ray remuxes with buggy DoVi authoring,
-// e.g. 23040 or 38528 nits). We always pass --edit-config with an L6
-// override clamped to the max legal value: harmless no-op for already
+// e.g. 23040 or 38528 nits).
+//
+// NOTE: --edit-config is a *global* dovi_tool option, but dovi_tool's own
+// docs state "Global options have no effect when injecting" for inject-rpu -
+// passing it alongside inject-rpu is silently ignored. The RPU must instead
+// be clamped as its own step (dovi_tool editor) *before* injection, using
+// the clamped RPU as --rpu-in. We always run this editor pass unconditionally
+// (no export/detection step needed): it's a harmless no-op for already
 // in-spec files, and lets out-of-spec files inject successfully while still
 // signalling "very bright" fallback to non-DoVi displays.
 var MAX_PQ_LUMINANCE = 10000;
 
 var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function () {
-    var lib, pluginWorkDir, rpuFilePath, outputFilePath, editConfigPath, fs, cliArgs, spawnArgs, cli, res;
+    var lib, pluginWorkDir, rpuFilePath, clampedRpuFilePath, outputFilePath, editConfigPath, fs, editCliArgs, editSpawnArgs, editCli, editRes, injectRpuPath, cliArgs, spawnArgs, cli, res;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -84,6 +90,7 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                 pluginWorkDir = "".concat(args.workDir, "/dovi_tool");
                 args.deps.fsextra.ensureDirSync(pluginWorkDir);
                 rpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.bin");
+                clampedRpuFilePath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.clamped.bin");
                 outputFilePath = "".concat((0, fileUtils_1.getPluginWorkDir)(args), "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".rpu.hevc");
                 editConfigPath = "".concat(pluginWorkDir, "/").concat((0, fileUtils_1.getFileName)(args.originalLibraryFile._id), ".edit_config.json");
                 fs = args.deps.fs || require('fs');
@@ -92,14 +99,44 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                         max_display_mastering_luminance: MAX_PQ_LUMINANCE,
                     },
                 }, null, 2));
-                cliArgs = [
-                    '--edit-config',
+
+                editCliArgs = [
+                    'editor',
+                    '-i',
+                    "".concat(rpuFilePath),
+                    '-j',
                     "".concat(editConfigPath),
+                    '-o',
+                    "".concat(clampedRpuFilePath),
+                ];
+                editSpawnArgs = editCliArgs.map(function (row) { return row.trim(); }).filter(function (row) { return row !== ''; });
+                editCli = new cliUtils_1.CLI({
+                    cli: '/usr/local/bin/dovi_tool',
+                    spawnArgs: editSpawnArgs,
+                    spawnOpts: {},
+                    jobLog: args.jobLog,
+                    outputFilePath: clampedRpuFilePath,
+                    inputFileObj: args.inputFileObj,
+                    logFullCliOutput: args.logFullCliOutput,
+                    updateWorker: args.updateWorker,
+                });
+                return [4 /*yield*/, editCli.runCli()];
+            case 1:
+                editRes = _a.sent();
+                injectRpuPath = rpuFilePath;
+                if (editRes.cliExitCode === 0 && fs.existsSync(clampedRpuFilePath) && fs.statSync(clampedRpuFilePath).size > 0) {
+                    injectRpuPath = clampedRpuFilePath;
+                }
+                else {
+                    args.jobLog('Clamping L6 max_display_mastering_luminance failed; proceeding with the original RPU (injection may still fail).');
+                }
+
+                cliArgs = [
                     'inject-rpu',
                     '-i',
                     "".concat(args.inputFileObj.file || args.inputFileObj._id),
                     '--rpu-in',
-                    "".concat(rpuFilePath),
+                    "".concat(injectRpuPath),
                     '-o',
                     "".concat(outputFilePath),
                 ];
@@ -115,7 +152,7 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                     updateWorker: args.updateWorker,
                 });
                 return [4 /*yield*/, cli.runCli()];
-            case 1:
+            case 2:
                 res = _a.sent();
                 if (res.cliExitCode !== 0) {
                     args.jobLog('Injecting DoVi RPU failed');
