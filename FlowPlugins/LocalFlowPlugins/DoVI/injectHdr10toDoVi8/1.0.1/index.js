@@ -120,7 +120,6 @@ var plugin = function (args) { return __awaiter(void 0, void 0, void 0, function
                         '-y', '-loglevel', 'error', '-stats',
                         '-map', '0:v:0',
                         '-c:v', 'copy',
-                        '-bsf:v', 'hevc_mp4toannexb',
                         '-f', 'hevc',
                         blHevcPath,
                     ],
